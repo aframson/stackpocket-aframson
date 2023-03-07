@@ -1,31 +1,4 @@
 
-import { getCombinations,mergeAndCheck2 } from "./helperFunctions";
-
-/**
- * this function perfoms a sum of 2 game 
- * @param {number} n this is the selected number 
- * @returns {number}
- */
-export function sumOf2(n) {
-    const arr = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18];
-    let increment = 6;
-    let currentValue = 6;
-    for (let i = 0; i < arr.length; i++) {
-      if (i === n) {
-        return  currentValue;
-      }
-      if (i === 9) {
-        increment =-increment;
-      }
-      currentValue += increment;
-    }
-  }
-
-
-
-
-
-
 
 /**
  * 
@@ -71,62 +44,7 @@ const TestFormu = (array,contraints=[],toform=1,isSpan=false,spanType=3) => {
 export default TestFormu;
 
 
-/**
- * The Sum Of First Three
- * @param {*} n The number to generate the sequence 
- * @returns 
- */
-export function SumOfFirstThree(n) {
-  if (n < 10) {
-    return ((n + 1) * (n + 2)) / 2;
-  } else if (n > 17) {
-    const index = [0,1, 2, 3, 4, 5, 6, 7, 8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27]
-      .slice(17, 28)
-      .reverse()
-      .indexOf(n - 1);
-    return (index * (index + 1)) / 2;
-  } else {
-    let term = 63;
-    if (n === 11 || n === 16) {
-      term += 6;
-    } else if (n === 12 || n === 15) {
-      term += 10;
-    } else if (n >= 13 && n <= 15) {
-      term += 12;
-    }
-    return term;
-  }
-}
 
 
 
 
-
-
-
-/**
- * The Sum Of First Three
- * @param {Number} n The number to generate the sequence 
- * @returns 
- */
-export function SumOfFirstThree(n) {
-  if (n < 10) {
-    return ((n + 1) * (n + 2)) / 2;
-  } else if (n > 17) {
-    const index = [0,1, 2, 3, 4, 5, 6, 7, 8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27]
-      .slice(17, 28)
-      .reverse()
-      .indexOf(n - 1);
-    return (index * (index + 1)) / 2;
-  } else {
-    let term = 63;
-    if (n === 11 || n === 16) {
-      term += 6;
-    } else if (n === 12 || n === 15) {
-      term += 10;
-    } else if (n >= 13 && n <= 15) {
-      term += 12;
-    }
-    return term;
-  }
-}
