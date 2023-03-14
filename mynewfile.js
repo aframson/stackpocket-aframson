@@ -25,3 +25,9 @@ const TestFormu = (array,contraints=[],toform=1,isSpan=false,spanType=3) => {
     }
   }
 };
+
+
+
+const update=()=>{
+    // this is an update
+}
