@@ -5,3 +5,10 @@ def myHome():
 class NeuralNet:
     def __init__(self) -> None:
         pass
+
+
+
+
+
+def goHiome:
+    name = "home"
