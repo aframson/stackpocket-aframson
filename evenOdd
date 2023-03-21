@@ -1,0 +1,83 @@
+const drawNumbers = [
+  [9, 8, 3, 2, 7],
+  [9, 1, 3, 2, 7],
+  [2, 8, 3, 2, 7],
+  [8, 8, 3, 2, 7],
+  [6, 8, 3, 2, 7],
+  [7, 1, 3, 2, 7],
+  [2, 5, 3, 2, 7],
+  [4, 3, 3, 2, 7]
+];
+//  for these drawnumbesr we should be able to check for the consecutive numbers of all the provided games below
+/**
+ * 1. Odd-even 1st...5th
+ * 2. Dragon-Tiger-And
+ * 3. Big-Small 1st...5th
+ */
+
+ export const evenAndOdd = (drawNumbers, type) => {
+  const columns = [0, 1, 2, 3, 4];
+
+  const boolArray = columns.map((item) =>
+    type === "even"
+      ? drawNumbers.map((array) => array[item] % 2 === 0)
+      : drawNumbers.map((array) => array[item] % 2 !== 0)
+  );
+  const consecutiveArray = {};
+  let count = 1;
+  columns.forEach((value) => {
+    boolArray[value]?.forEach((item, index) =>
+      item === boolArray[value][index + 1] && item === true
+        ? count++
+        : (count > 1 && (consecutiveArray[value + 1] = count), (count = 1))
+    );
+  });
+  return ([
+    {
+      typeOfPaly: consecutiveArray['5'],
+      consecPeriod: `20 issues in a row`,
+      coverTime: "00:17:54",
+      opt1: "One",
+      opt2: "Big"
+    }
+  ])
+};
+
+// return ([
+//   {
+//     typeOfPaly: 20,
+//     consecPeriod: `20 issues in a row`,
+//     coverTime: "00:17:54",
+//     opt1: "One",
+//     opt2: "Big"
+//   }
+// ])
+
+// function getCombinations(array, r) {
+//   const result = [];
+//   // Recursive function to generate combinations
+//   function generateCombos(combination, index) {
+//     if (combination.length === r) {
+//       result.push(combination);
+//       return;
+//     }
+
+//     if (index >= array.length) {
+//       return;
+//     }
+//     const newCombo = [...combination];
+//     newCombo.push({ index: index + 1, val: array[index] });
+
+//     generateCombos(newCombo, index + 1);
+//     generateCombos(combination, index + 1);
+//   }
+
+//   generateCombos([], 0);
+//   return result;
+// }
+
+console.log(evenAndOdd(drawNumbers, "odd"));
+
+// export const evenAndOdd  = ()=> []
+
+
