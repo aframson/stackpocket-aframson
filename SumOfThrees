@@ -1,0 +1,21 @@
+function generateSequence(n) {
+  if (n < 10) {
+    return ((n + 1) * (n + 2)) / 2;
+  } else if (n > 17) {
+    const index = buttons
+      .slice(17, 28)
+      .reverse()
+      .indexOf(n - 1);
+    return (index * (index + 1)) / 2;
+  } else {
+    let term = 63;
+    if (n === 11 || n === 16) {
+      term += 6;
+    } else if (n === 12 || n === 15) {
+      term += 10;
+    } else if (n >= 13 && n <= 15) {
+      term += 12;
+    }
+    return term;
+  }
+}
