@@ -1,0 +1,31 @@
+
+import html2canvas from 'html2canvas';
+import { saveAs } from 'file-saver';
+
+function ImageDownload() {
+  const handleDownloadClick = () => {
+    const imageWrapper = document.getElementById('image-wrapper');
+
+    html2canvas(imageWrapper).then(canvas => {
+      saveImage(canvas);
+    });
+  };
+
+  const saveImage = canvas => {
+    canvas.toBlob(blob => {
+      saveAs(blob, 'image.png');
+    });
+  };
+
+  return (
+    <div>
+      <div id="image-wrapper">
+        <img src="your-image-url-here" alt="Your Image" />
+        <p>Your Text Here</p>
+      </div>
+      <button onClick={handleDownloadClick}>Download Image</button>
+    </div>
+  );
+}
+
+export default ImageDownload;
