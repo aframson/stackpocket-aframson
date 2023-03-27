@@ -1,0 +1,5 @@
+  1 of 1 unhandled error
+
+      Unhandled Runtime Error
+      TypeError: undefined is not an object (evaluating 'html_to_image__WEBPACK_IMPORTED_MODULE_3__["default"].toPng')
+
