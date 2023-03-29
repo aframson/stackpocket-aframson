@@ -1,0 +1,4 @@
+const filterZero = (arr) => {
+    const filtered = arr.filter((item) => item !== 0);
+    return filtered.length;
+  };
