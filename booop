@@ -1,0 +1,13 @@
+    const addMoney = (value)=>{
+           const isPart  = selectedValue.find(data=>data.value === value)
+           if (isPart !== undefined) {
+              if (isPart.value === value) {
+                 setValue(prev=>[...prev,{money:prev.money + money}])
+              }else{
+                setValue(prev=>[...prev,{value:value,money:money}])
+
+              }
+           }else{
+            setValue(prev=>[...prev,{value:value,money:money}])
+           }
+    }
