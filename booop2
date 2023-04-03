@@ -1,0 +1,16 @@
+const addMoney = (value, money) => {
+    const existingObject = selectedValue.find(obj => obj.value === value);
+  
+    if (existingObject) {
+      // If the object already exists in the array, update its money value
+      const updatedObject = {
+        ...existingObject,
+        money: existingObject.money + money
+      };
+      setSelectedValue(prevValue => prevValue.map(obj => obj.value === value ? updatedObject : obj));
+    } else {
+      // If the object doesn't exist in the array, add it to the array
+      setSelectedValue(prevValue => [...prevValue, { value, money }]);
+    }
+  };
+  
