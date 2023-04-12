@@ -1,0 +1,3 @@
+ function fun<T extends SomeOtherType>(arg: T): void {
+        // Function implementation
+      }
