@@ -1,0 +1,5 @@
+
+// steps in sending docker image to gcp container registry
+// 1. docker tag microv2 gcr.io/comp7033-cw1-19231528/microv2
+// 2. docker push gcr.io/comp7033-cw1-19231528/microv2
+
