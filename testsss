@@ -1,0 +1,33 @@
+'use client'
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+
+const PageLoader = () => {
+  const router = useRouter();
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const events = router.events
+
+  useEffect(() => {
+    events.on('routeChangeStart', () => {
+      setIsLoading(true);
+    });
+
+    events.on('routeChangeComplete', () => {
+      setIsLoading(false);
+    });
+  }, []);
+
+  return (
+    <div>
+      {isLoading ? <div>Loading...</div> : null}
+      <main>
+        {/* Your page content goes here */}
+      </main>
+    </div>
+  );
+};
+
+export default PageLoader;
+
