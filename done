@@ -1,0 +1,28 @@
+import { useRouter } from 'next/router';
+
+const App = () => {
+  const router = useRouter();
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    router.events.on('routeChangeStart', () => {
+      setIsLoading(true);
+    });
+
+    router.events.on('routeChangeComplete', () => {
+      setIsLoading(false);
+    });
+  }, []);
+
+  return (
+    <div>
+      {isLoading ? <div>Loading...</div> : null}
+      <main>
+        {/* Your page content goes here */}
+      </main>
+    </div>
+  );
+};
+
+export default App;
