@@ -1,0 +1,50 @@
+
+  useEffect(() => {
+    if (selectedTabGame && selectedTabGame.length > 0) {
+      const firstItem = selectedTabGame[0];
+      const subgroup = selectedTabGame.map((items) => items)[0]
+      const game = subgroup.subgroup[0].games[0];
+
+      const {
+        group,
+        // subgroup: { games },
+      } = firstItem;
+
+      const {
+        name,
+        currentodds,
+        guide,
+        sample,
+        rows,
+        end,
+        start,
+        columnSelection,
+        rowSelection,
+        showRowName,
+        startingPoint,
+        endingPoint,
+        model,
+        game_id,
+      } = game;
+
+
+      setGameModels(model);
+      setEndingpoint(endingPoint);
+      setGameType_id(game_id);
+      setgetValue(group);
+      setGameGroup(group)
+      setDet(subgroup);
+      setGame_type_name(name);
+      setOdds(currentodds);
+      setHowToplay(guide);
+      setSample(sample);
+      setRows(rows);
+      setStart(start);
+      setEnd(end);
+      setColumnSelection(columnSelection);
+      setRowSelection(rowSelection);
+      setShowRowName(showRowName);
+      setStartingPoint(startingPoint);
+    }
+
+  }, [selectedTabGame]);
