@@ -1,0 +1,38 @@
+ <Tab
+                          onClick={() => {
+                            console.log("indio::", data);
+                            setDet(data);
+                            setgetValue(data.group);
+                            setGameGroup(data.group)
+                            // setselectedGameId(data.subgroup[0].games[0].game_id);
+                            setGameType_id(data.subgroup[0].games[0].game_id);
+                            setGame_type_name(data.subgroup[0].games[0].name);
+                            setOdds(data.subgroup[0].games[0].currentodds);
+                            setHowToplay(data.subgroup[0].games[0].guide);
+                            setSample(data.subgroup[0].games[0].sample);
+                            setRows(data.subgroup[0].games[0].rows);
+                            setStart(data.subgroup[0].games[0].start);
+                            setEnd(data.subgroup[0].games[0].end);
+                            setColumnSelection(data.subgroup[0].games[0].columnSelection);
+                            setRowSelection(data.subgroup[0].games[0].rowSelection);
+                            setShowRowName(data.subgroup[0].games[0].showRowName);
+                            setStartingPoint(data.subgroup[0].games[0].startingPoint);
+                            setEndingpoint(data.subgroup[0].games[0].endingPoint);
+                            setGameModels(data.subgroup[0].games[0].model);
+
+                            // console.log('****|||||||***',data.subgroup[0].games[0].game_id)
+                            // console.log('****|||||||***',data.subgroup[0].games[0].name)
+                            // setLotteryName(data);
+                            // console.log('****|||||||***',item.lottery_id)
+                            // setLotteryName(data);
+                            dispatch({
+                              type: ACTION_TYPES.CLEAR_ALL_ROWS,
+                              payload: reducerSelectionsArray([]),
+                            });
+                          }}
+                          className={`${data.group === getValue ? styles.tab : null
+                            }`}
+                          style={{ color: "white" }}
+                          key={i}
+                          label={data.group}
+                        />
