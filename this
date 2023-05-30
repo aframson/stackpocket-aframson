@@ -1,0 +1,5 @@
+  # load embeddings from json file
+    from datasets import load_dataset
+    embedding_data = load_dataset('aframson/lighthouse', data_files=[filename+embeddings_extension])
+    embedding_data = embedding_data['train']
+    embeddings = embedding_data[0]['vectors'][0]
