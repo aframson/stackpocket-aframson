@@ -1,0 +1,28 @@
+
+
+× Building wheel for hnswlib (pyproject.toml) did not run successfully.
+  │ exit code: 1
+  ╰─> [17 lines of output]
+      running bdist_wheel
+      running build
+      running build_ext
+      creating var
+      creating var/folders
+      creating var/folders/pz
+      creating var/folders/pz/07hvlsvn0tq6pfs_s0zcqch00000gn
+      creating var/folders/pz/07hvlsvn0tq6pfs_s0zcqch00000gn/T
+      clang -Wno-unused-result -Wsign-compare -Wunreachable-code -fno-common -dynamic -DNDEBUG -g -fwrapv -O3 -Wall -iwithsysroot/System/Library/Frameworks/System.framework/PrivateHeaders -iwithsysroot/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Headers -arch arm64 -arch x86_64 -Werror=implicit-function-declaration -Wno-error=unreachable-code -I/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Headers -c /var/folders/pz/07hvlsvn0tq6pfs_s0zcqch00000gn/T/tmpgx7l40qd.cpp -o var/folders/pz/07hvlsvn0tq6pfs_s0zcqch00000gn/T/tmpgx7l40qd.o -std=c++14
+      clang -Wno-unused-result -Wsign-compare -Wunreachable-code -fno-common -dynamic -DNDEBUG -g -fwrapv -O3 -Wall -iwithsysroot/System/Library/Frameworks/System.framework/PrivateHeaders -iwithsysroot/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Headers -arch arm64 -arch x86_64 -Werror=implicit-function-declaration -Wno-error=unreachable-code -I/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Headers -c /var/folders/pz/07hvlsvn0tq6pfs_s0zcqch00000gn/T/tmpkrugkc_9.cpp -o var/folders/pz/07hvlsvn0tq6pfs_s0zcqch00000gn/T/tmpkrugkc_9.o -fvisibility=hidden
+      building 'hnswlib' extension
+      creating build
+      creating build/temp.macosx-10.9-universal2-cpython-39
+      creating build/temp.macosx-10.9-universal2-cpython-39/python_bindings
+      clang -Wno-unused-result -Wsign-compare -Wunreachable-code -fno-common -dynamic -DNDEBUG -g -fwrapv -O3 -Wall -iwithsysroot/System/Library/Frameworks/System.framework/PrivateHeaders -iwithsysroot/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Headers -arch arm64 -arch x86_64 -Werror=implicit-function-declaration -Wno-error=unreachable-code -I/private/var/folders/pz/07hvlsvn0tq6pfs_s0zcqch00000gn/T/pip-build-env-3vnh7cp4/overlay/lib/python3.9/site-packages/pybind11/include -I/private/var/folders/pz/07hvlsvn0tq6pfs_s0zcqch00000gn/T/pip-build-env-3vnh7cp4/overlay/lib/python3.9/site-packages/numpy/core/include -I./hnswlib/ -I/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Headers -c ./python_bindings/bindings.cpp -o build/temp.macosx-10.9-universal2-cpython-39/./python_bindings/bindings.o -O3 -march=native -stdlib=libc++ -mmacosx-version-min=10.7 -DVERSION_INFO=\"0.7.0\" -std=c++14 -fvisibility=hidden
+      clang: error: the clang compiler does not support '-march=native'
+      error: command '/usr/bin/clang' failed with exit code 1
+      [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+  ERROR: Failed building wheel for hnswlib
+Failed to build hnswlib
+ERROR: Could not build wheels for hnswlib, which is required to install pyproject.toml-based projects
