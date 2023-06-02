@@ -1,0 +1,24 @@
+import React from 'react'
+const CircularProgress = ({size,strokeWidth}:any)=>{
+
+    const viewBox = `0 0 ${size} ${size}`;
+    const radius = (size - strokeWidth) / 2
+
+
+    return(
+        <svg width={size} height={size} viewBox={viewBox}>
+            <circle
+              fill='#000'
+              stroke='#ccc'
+              cx={size / 2}
+              cy={size / 2}
+              radius={radius}
+              strokeWidth={`${strokeWidth}px`}
+            />
+        </svg>
+    )
+
+}
+
+
+export default CircularProgress
