@@ -1,0 +1,9 @@
+  <Link href={'/login'}>
+                <Button 
+                  text={'Sign up / Log in'} 
+                  action={()=>{}}
+                  style={{background:'none',border:'1px solid white',color:'white',paddingRight:15}}
+                  variant={isSearch}  
+                  type={'outline'}
+                />
+            </Link>
