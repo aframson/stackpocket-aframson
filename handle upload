@@ -1,0 +1,65 @@
+       export const handleUpload = (title, description, pricing, comparePrice, cpp, sku, barCode, numberAvailable, status, weight, customsInfo, country, hs, optionData, keywordData, setLoading, imageLocation, setProgress, setMsg, errMsg) => {
+    setLoading(true)
+    const promises = []
+    const images = [];
+    for (let x = 0; x < imageLocation.length; x++) {
+        const file = imageLocation[x];
+        console.log('loop');
+        const storage = getStorage();
+        const uniquename = random() + file.name
+
+        const sotrageRef = ref(storage, uniquename);
+        const uploadTask = uploadBytesResumable(sotrageRef, file);
+        promises.push(uploadTask)
+        uploadTask.on("state_changed", (snapshot) => {
+            const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+            setProgress(progress)
+        }, (error) => console.log(error), async () => {
+            await getDownloadURL(uploadTask.snapshot.ref).then((downloadURLs) => {
+                images.push(downloadURLs);
+                console.log("File available at", downloadURLs);
+                console.log("images ===", images);
+                if (images.length === imageLocation.length) {
+                    console.log('Now its ready ++++')
+                    console.log("new images ===", images);
+                    const exportData = {
+                        discount:0,
+                        info: {
+                            title: title,
+                            description: description
+                        },
+                        images: images,
+                        pricing: {
+                            price: pricing,
+                            comparePrice: comparePrice,
+                            cpp: cpp
+                        },
+                        inventory: {
+                            sku: sku,
+                            barCode: barCode,
+                            numberAvailable: numberAvailable
+                        },
+                        status: status,
+                        shipping: {
+                            weight: weight,
+                            customsInfo: customsInfo,
+                            country: country,
+                            hs: hs
+                        },
+                        options: optionData,
+                        keywords: keywordData
+                    }
+                    addProduct(exportData, setMsg, errMsg, setLoading, setProgress);
+                }
+            });
+        }
+        );
+    }
+    Promise.all(promises)
+        .then(() => {
+            console.log('promises:', promises)
+        })
+        .then(err => console.log(err))
+
+};
+
