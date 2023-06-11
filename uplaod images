@@ -1,0 +1,58 @@
+export const chooseImage = (file, setImageUrl, setImageLocation, errMsg) => {
+
+  if (file.length > 3) {
+      errMsg("files should not be more than 3")
+  } else {
+      for (let x = 0; x < file.length; x++) {
+          const single = file[x];
+          console.log('file', single.name)
+          let value = URL.createObjectURL(single);
+          setImageUrl(prev => [...prev, value]);
+      }
+      setImageLocation(file)
+  }
+
+}
+
+
+
+export const chooseImageWhenUpdated = (file, imageurl, setLoading, setProgress, setMsg, errMsg, id) => {
+  if (file.length > 3) {
+      errMsg("Images should not more than 3")
+  } else {
+      setLoading(true)
+      const promises = []
+      const images = [];
+      imageurl.map(items => {
+          images.push(items)
+      })
+      for (let x = 0; x < file.length; x++) {
+          const mainfile = file[x];
+          const uniquename = random() + mainfile.name
+          console.log('file', mainfile.name)
+          console.log('loop');
+          const storage = getStorage();
+          const sotrageRef = ref(storage,uniquename);
+          const uploadTask = uploadBytesResumable(sotrageRef, mainfile);
+          promises.push(uploadTask)
+          uploadTask.on("state_changed", (snapshot) => {
+              const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+              setProgress(progress)
+          }, (error) => console.log(error), async () => {
+              await getDownloadURL(uploadTask.snapshot.ref).then((downloadURLs) => {
+                  images.push(downloadURLs);
+                  console.log("File available at", downloadURLs);
+                  if (images.length >= file.length) {
+                      console.log('Now its ready ++++')
+                      console.log("new images ===", images);
+                      UpdateImage(id, images, setLoading, setMsg, errMsg, setProgress)
+                  }
+              });
+          }
+          );
+      }
+      Promise.all(promises).then(() => { console.log('promises:', promises) }).then(err => console.log(err))
+  }
+
+}
+
