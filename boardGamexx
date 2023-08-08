@@ -1,0 +1,361 @@
+import React,{useState,useEffect, useCallback} from 'react'
+import styles  from './page.module.css'
+                      
+import BullBull from './trial';
+
+import {HiQuestionMarkCircle} from 'react-icons/hi'
+import LotteryNumbers from '../uiComponents/HelperComponents/LotteryBounceEffect';
+const Section1data = [
+    {
+        first:[
+            'Bull big',
+            'Bull odd'
+         ]
+    },
+    {
+        second:[
+            'Bull 1',
+            'Bull 2',
+            'Bull 3',
+            'Bull 4',
+            'Bull 5',
+            'Bull 6',
+            'Bull 7',
+            'Bull 8',
+            'Bull 9',
+            'Bull Bull',
+            'No Bull',
+
+         ]
+    },
+    {
+        third:[
+            'Bull small',
+            'Bull even'
+         ]
+    },
+   
+]
+
+
+const Section2data =[
+    {
+        max:[
+            'ten thousand',
+            'thousand',
+            'hundreds',
+            'tens',
+            'once',
+         ]
+    },
+    {
+        min:[
+            'Ten thousand',
+            'Thousand',
+            'Hundreds',
+            'Tens',
+            'Once',
+         ]
+    },
+    {
+        third:[
+            'Dragon',
+            'Tiger',
+            'Draw'
+         ]
+    },
+   
+]
+const MoneyData = [1,5,10,50,100,500,1000]
+
+function BoardGames() {
+
+
+
+    const [selectedValue,setValue] = useState([])
+    const [money,setMoney] =  useState(1)
+    const [drawNumbers, setDrawNumbers] = useState([]);
+    const [highlight,setHighLight] = useState([])
+
+
+
+    const [timeRemaining, setTimeRemaining] = useState(
+      parseInt(localStorage.getItem("timeRemaining")) || 10
+    );
+    const [randomNumber, setRandomNumber] = useState(
+      localStorage.getItem("randomNumber") || 0
+    );
+  
+ 
+  
+    function generateRandomNumber() {
+      const randomNumber = Math.floor(Math.random() * 100000).toString(10);
+      return randomNumber.padStart(5, "0");
+    }
+  
+    useEffect(() => {
+      const intervalId = setInterval(() => {
+        setTimeRemaining((prevTime) => prevTime - 1);
+      }, 1000);
+  
+      if (timeRemaining === 0) {
+        clearInterval(intervalId);
+      }
+  
+      return () => clearInterval(intervalId);
+    }, [timeRemaining]);
+  
+    useEffect(() => {
+      localStorage.setItem("timeRemaining", timeRemaining);
+  
+      if (timeRemaining === 0) {
+        setTimeRemaining(10);
+        let random_number = generateRandomNumber();
+        localStorage.setItem("randomNumber", random_number);
+        setRandomNumber(random_number);
+      }
+    }, [timeRemaining]);
+  
+    useEffect(() => {
+      setDrawNumbers((prev) => [
+        ...prev,
+        randomNumber.toString().split("").map(Number)
+      ]);
+      console.log("history :", drawNumbers);
+    }, [randomNumber]);
+  
+    const formatTime = (time) => {
+      const hours = Math.floor(time / 3600)
+        .toString()
+        .padStart(2, "0");
+      const minutes = Math.floor((time % 3600) / 60)
+        .toString()
+        .padStart(2, "0");
+      const seconds = (time % 60).toString().padStart(2, "0");
+      return `${hours}:${minutes}:${seconds}`;
+    };
+  
+
+
+    const addMoney = (value, money) => {
+        const existingObject = selectedValue.find(obj => obj.value === value);
+      
+        if (existingObject) {
+          // If the object already exists in the array, update its money value
+          const updatedObject = {
+            ...existingObject,
+            money: existingObject.money + money
+          };
+          setValue(prevValue => prevValue.map(obj => obj.value === value ? updatedObject : obj));
+        } else {
+          // If the object doesn't exist in the array, add it to the array
+          setValue(prevValue => [...prevValue, { value, money }]);
+        }
+      };
+
+      
+      const RenderTimer = useCallback(
+        ({ randomNumber }) => (
+          <center>
+            <div
+              style={{
+                marginTop: 100,
+                padding: 10,
+                width: 400,
+                overflow: "hidden"
+              }}
+            >
+              <LotteryNumbers
+                numbers={randomNumber.toString().split("").map(Number)}
+              />
+            </div>
+          </center>
+        ),
+        [randomNumber]
+      );
+  
+    // useEffect(()=>{
+    //   const nr = randomNumber.toString().split("").map(Number)
+    //   console.log('>>>',nr)
+    //     // console.log(checkBullBull(nr))
+    //     // console.log('xxxxxxxxx*',BullBull(nr))
+
+    //     const final = BullBull(nr);
+    //     if (final === 'Does not qualify as bull bull') {
+    //       setHighLight([]);
+    //       setValue([])
+    //     }else{
+    //       setHighLight(final);
+    //       setTimeout(()=>{
+    //         setValue([])
+    //       },3000)
+    //     }
+    //     console.log('high::',highlight)
+    // },[randomNumber])
+
+
+  return (
+    <div className={styles.gone}>
+      <center>
+        <h1 className={styles.time_remaining}>{formatTime(timeRemaining)}</h1>
+      </center>
+      <div className={styles.barbox}>
+        <div
+          style={{ width: timeRemaining * 10 + "%", transition: 0.3 + "s" }}
+          className={styles.bar}
+        ></div>
+      </div>
+       {randomNumber && <RenderTimer randomNumber={randomNumber} />}
+    
+       {/* <div className={styles.moon}>hdhd</div> */}
+      <div className={styles.board1}>
+        <div className={styles.board2}>
+            <div className={styles.board3}>
+               <div className={styles.arfro}>
+                  <div className={styles.b1}>
+                   {Section1data[0].first.map((item,i)=>{
+                   
+                   const isPart  = selectedValue.find(data=>data.value === item)
+                   const high = highlight.find(y=> y === item)
+                   
+                   return (
+                        <div  onClick={()=>addMoney(item,money)} 
+                        className={`${styles.gr} ${high ? `${styles.blink}` : ''}`} // Apply the 'blink' class conditionally
+                        >
+                             {isPart?(
+                                <div className={styles.ballmoney}>{isPart.money}</div>
+                             ):null}
+                            {item}
+                        </div>
+                   )})}
+                  </div>
+                   
+                  <div className={styles.b12}>
+                   
+                   {Section1data[1].second.map((item,i)=>{
+                   const isPart  = selectedValue.find(data=>data.value === item)
+                   const high = highlight.find(y=> y === item)
+                   return (
+                        <div  onClick={()=>addMoney(item,money)} 
+                        className={`${styles.gr2} ${high ? `${styles.blink}` : ''}`}>
+                              {isPart?(
+                                <div className={styles.ballmoney}>{isPart.money}</div>
+                             ):null}
+                           <div  className={styles.xx}>{item}</div>
+
+                        </div>
+                   )}
+                   )}
+                  </div>
+                  <div className={styles.b1}>
+                   {Section1data[2].third.map((item,i)=>{
+                   const isPart  = selectedValue.find(data=>data.value === item)
+                   const high = highlight.find(y=> y === item)
+                   
+                   return (
+                        <div  onClick={()=>addMoney(item,money)}  className={`${styles.gr} ${high ? `${styles.blink}` : ''}`}>
+                            {item}
+                            {isPart?(
+                                <div className={styles.ballmoney}>{isPart.money}</div>
+                             ):null}
+                        </div>
+                   )})}
+                  </div>
+               </div>
+
+
+               <div className={styles.arfro2}>
+
+                <div className={styles.tit}>
+                     <div className={styles.fd}>
+                       <div className={styles.cc}>
+                         <HiQuestionMarkCircle size={20} color={'#26465f'}/>
+                          MAXIMUM
+                       </div> 
+                     </div>
+                     <div className={styles.fd}>
+                        <div className={styles.cc}>
+                          <HiQuestionMarkCircle size={20} color={'#26465f'}/><br/>
+                            MINIMUM
+                        </div> 
+                     </div>
+                </div>
+
+                 <div className={styles.b12x}>
+                   {Section2data[0].max.map((item,i)=>{
+                   const isPart  = selectedValue.find(data=>data.value === item)
+                   const high = highlight.find(y=> y === item)
+                   
+                   
+                   return (
+                        <div   onClick={()=>addMoney(item,money)} className={`${styles.gr2} ${high ? `${styles.blink}` : ''}`}>
+                              {isPart?(
+                                <div className={styles.ballmoney}>{isPart.money}</div>
+                             ):null}
+                           <div className={styles.xx}>{item}</div>
+                        </div>
+                   )})}
+
+                   {Section2data[1].min.map((item,i)=>{
+                   const isPart  = selectedValue.find(data=>data.value === item)
+                   const high = highlight.find(y=> y === item)
+                   
+                   
+                   return (
+                        <div   onClick={()=>addMoney(item,money)} className={`${styles.gr2} ${high ? `${styles.blink}` : ''}`}>
+                              {isPart?(
+                                <div className={styles.ballmoney}>{isPart.money}</div>
+                             ):null}
+                           <div className={styles.xx}>{item}</div>
+                        </div>
+                   )})}
+
+                  </div>
+
+                  <div className={styles.b1}>
+                    {Section2data[2].third.map((item,i)=>{
+                  
+                    const isPart  = selectedValue.find(data=>data.value === item)
+                    const high = highlight.find(y=> y === item)
+                    
+                    
+                    return (
+                            <div style={{height:0}}  onClick={()=>addMoney(item,money)} className={`${styles.gr} ${high ? `${styles.blink}` : ''}`}>
+                                {item}
+                                {isPart?(
+                                <div className={styles.ballmoney}>{isPart.money}</div>
+                             ):null}
+                            </div>
+                    )})}
+                  </div>
+
+               </div>
+
+               {/* <div className={styles.moneystyle}>
+                    <div className={styles.moneybox}>
+                        {MoneyData.map((data)=>(
+                            <div style={{transform:data === money?'scale(1.5)':null}} onClick={()=>setMoney(data)} className={styles.mo}>
+                                <div className={styles.bal}>{data}</div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className={styles.betbutt}>
+                        <div className={styles.sa}>
+                            Bet 
+                        </div>                                                                                               
+                    </div>
+                    <div className={styles.moneys}>
+                        {TotalValue} yarn                                                                          
+                    </div>
+               </div> */}
+
+               
+            </div>
+        </div>
+    </div>
+    </div>
+   
+  )
+}
+
+export default BoardGames
