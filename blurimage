@@ -1,0 +1,52 @@
+import React from "react";
+import styles from "../../styles/BlurImageView.module.css";
+import Image from "next/image";
+
+function BlurImageView({ image, showBlur = true,imageRadius=20,height=350,width='100%'}) {
+
+
+  return (
+    <div style={{borderRadius:imageRadius,height:height,width:width}} className={styles.imagecontainer}>
+      {showBlur ? (
+        <>
+          <div  className={styles.imgbox}>
+            <Image
+              src={image}
+              alt="product-image"
+              placeholder="blur"
+              height={350}
+              width={350}
+              className={styles.blurredimage}
+              blurDataURL={"data://image..."}
+            />
+          </div>
+            <div  className={styles.imgbox2}>
+              <Image
+                src={image}
+                alt="product-image"
+                placeholder="blur"
+                height={350}
+                width={350}
+                className={styles.image}
+                blurDataURL={"data://image..."}
+              />
+            </div>
+        </>
+      ) : (
+        <div  className={styles.imgbox}>
+          <Image
+            src={image}
+            alt="product-image"
+            placeholder="blur"
+            height={250}
+            width={250}
+            className={styles.image2}
+            blurDataURL={"data://image..."}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default BlurImageView;
