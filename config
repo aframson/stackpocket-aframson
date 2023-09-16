@@ -1,0 +1,42 @@
+
+from transformers import PretrainedConfig
+
+class OBIConfig(PretrainedConfig):
+    def __init__(self, 
+    model_type="OBILanguageModel", 
+    auto_map={
+        "AutoConfig": "modelConfig.OBIConfig",
+        "AutoModel": "modelLM.OBILanguageModel",
+        "AutoModelForCausalLM": "modelLM.OBILanguageModel",
+        "AutoModelForQuestionAnswering": "modelLM.OBILanguageModel"
+    }, 
+    vocab_size=1000, 
+    hidden_size=4, 
+    num_attention_heads=2, 
+    num_hidden_layers=2, 
+    hidden_dropout_prob=0.1, 
+    block_size=100, 
+    batch_size=60,
+    max_iters=200,
+    eval_interval=100,
+    learning_rate=0.001,
+    device="cpu",
+    **kwargs
+    )->None:
+        super().__init__(**kwargs)
+        self.model_type = model_type
+        self.auto_map = auto_map
+        self.vocab_size = vocab_size
+        self.hidden_size = hidden_size
+        self.num_attention_heads = num_attention_heads
+        self.num_hidden_layers = num_hidden_layers
+        self.hidden_dropout_prob = hidden_dropout_prob
+        self.block_size = block_size
+        self.batch_size = batch_size
+        self.max_iters = max_iters
+        self.eval_interval = eval_interval
+        self.learning_rate = learning_rate
+        self.device = device
+
+
+
