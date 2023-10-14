@@ -1,0 +1,5 @@
+ {imageurl ? (
+                            <div className={styles.imageboxx}>
+                                {imageurl ? <Image blurDataURL={imageurl} src={imageurl} alt="product-image" placeholder='blur' height={100} width={100} className={styles.imagex} /> : null}
+                            </div>
+                        ) : null}
