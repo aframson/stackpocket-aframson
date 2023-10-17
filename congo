@@ -1,0 +1,36 @@
+ <div className={styles.container}>
+        <div className={styles.nthbox}>
+          {nth.map((n,i)=>(
+            <div className={styles.nth} key={i}>{n}</div>
+          ))}
+        </div>
+        <div className={styles.board}>
+
+          {firstConvo.map((item,index)=>(
+            <div className={styles.boarditem} key={index}>
+              <div className={styles.name}>{item.name}</div>
+              <div className={styles.odds}>{item.odds}</div>
+              <input className={styles.input} type="text" />
+            </div>
+          ))}
+
+        </div>
+        <center className={styles.center}>
+            <div className={styles.line}></div>
+        </center>
+        <div className={styles.board}>
+          {SecondConvo.map((item,index)=>(
+            <div id={styles.boa} className={styles.boarditem} key={index}>
+              <div id={styles.circle} className={styles.name}>
+                <div className={styles.hide}></div>
+                <div className={styles.number}>
+                  {item.name}
+                </div>
+              </div>
+              <div className={styles.odds}>{item.odds}</div>
+              <input className={styles.input} type="text" />
+            </div>
+          ))}
+          </div>
+        
+    </div>
