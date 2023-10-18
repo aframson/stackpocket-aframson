@@ -1,0 +1,5 @@
+export const FormatMoney = (value: any) => {
+    let val = parseInt(value)
+    const formattedValue = val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return formattedValue;
+}
