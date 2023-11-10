@@ -1,0 +1,37 @@
+import os
+import pandas as pd
+from tqdm import tqdm
+
+def convert_all_csv_to_text(folder_path, output_text_file, column1_name, column2_name):
+    # Get a list of all CSV files in the specified folder
+    csv_files = [file for file in os.listdir(folder_path) if file.endswith('.csv')]
+
+    # Initialize the progress bar
+    tqdm.pandas()
+
+    # Iterate through each CSV file and convert the specified columns to text
+    for csv_file in tqdm(csv_files, desc='Processing CSV files'):
+        csv_path = os.path.join(folder_path, csv_file)
+        df = pd.read_csv(csv_path)
+
+        # Convert the specified columns to text
+        df[column1_name] = df[column1_name].progress_apply(str)
+        df[column2_name] = df[column2_name].progress_apply(str)
+
+        # Append the text to the output file
+        with open(output_text_file, 'a', encoding='utf-8') as text_file:
+            text_file.write('\n'.join(df[column1_name] + ' ' + df[column2_name]) + '\n')
+
+if __name__ == "__main__":
+    # Replace 'folder_path', 'output_text_file', 'column1_name', and 'column2_name' with your values
+    folder_path = 'data/bible/'
+    output_text_file = 'csv_text.txt'
+    column1_name = 'Verse 1'
+    column2_name = 'Verse 2'
+
+    # Clear the existing content of the output file
+    with open(output_text_file, 'w') as text_file:
+        text_file.write('')
+
+    # Call the function
+    convert_all_csv_to_text(folder_path, output_text_file, column1_name, column2_name)
