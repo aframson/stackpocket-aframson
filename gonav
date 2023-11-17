@@ -1,0 +1,13 @@
+ const handlenavigation = (data) => {
+    const encodeData = encodeURIComponent(JSON.stringify(data));
+    const link = `/gameplay/${encodeData}`;
+    addItemTotabStorage(data);
+    router.push(link);
+    // setActiveSideBar(false);
+    setSideBarData({ ...sideBarData, activeSideBar: false });
+    setLotteryData({
+      ...lotteryData,
+      lottery_id: data.lottery_id,
+      lottery_name: data.name
+    });
+  };
