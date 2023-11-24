@@ -1,0 +1,249 @@
+.container{
+    /* border: 1px solid; */
+    bottom: 0;
+    position: fixed;
+    width: 60vw;
+    height: 130px;
+    border-radius: 15px 15px 0px 0px;
+    background-color: #1F4D93;
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+    overflow: hidden;
+    padding-bottom: 22px;
+    padding-top: 5px;
+    left:14vw;
+}
+.controlpane{
+    /* border: 1px solid; */
+    display: grid;
+    grid-template-columns: 0.45fr 1fr 0.6fr;
+    justify-content: space-between;
+}
+.controlpanex{
+    /* border: 1px solid; */
+    display: grid;
+    grid-template-columns: 0.7fr 0.7fr 0.7fr;
+    justify-content: space-between;
+}
+.itempane{
+    /* border: 1px solid red; */
+    width: 100%;
+}
+.bool{
+    /* border: 1px solid yellow; */
+    display: grid;
+    grid-template-columns: 0.19fr 1fr;
+    justify-content: space-between;
+    padding: 4px;
+}
+.calculatequatar{
+    /* border: 1px solid; */
+    width: 100%;
+}
+.boolas{
+    display: flex;
+    /* border: 1px solid; */
+    /* justify-content: space-between; */
+    /* padding-right: 20px; */
+}
+.unit{
+    background:none;
+    border: none;
+    font-weight: 900;
+    color: white;
+}
+.bool{
+    /* border: 1px solid yellow; */
+    display: grid;
+    grid-template-columns: 0.19fr 1fr;
+    justify-content: space-between;
+    padding: 4px;
+}
+#bool{
+    /* border: 1px solid yellow; */
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-content: space-between;
+    padding: 4px;
+}
+.prebox{
+    display: flex;
+    gap: 10px;
+    /* border: 1px solid rgb(224, 224, 224); */
+    padding: 10px;
+    border-radius: 100px;
+    height: 6px;
+}
+.prebox{
+    color: white;
+    font-size: 11px;
+}
+.predate{
+    margin-top: -4px;
+}
+.arrow{
+    margin-top: -7px;
+}
+.pre{
+    color: white;
+    margin: 7px;
+    font-weight: 800;
+    font-size: 12px;
+    /* border: 1px solid; */
+}
+#prex{
+    color: white;
+    margin: 7px;
+    font-weight: 800;
+    font-size: 12px;
+    /* border: 1px solid; */
+    width: 70px;
+}
+#prex{
+    color: white;
+    margin: 7px;
+    font-weight: 800;
+    font-size: 12px;
+    /* border: 1px solid; */
+    width: 70px;
+}
+.multiamount{
+    /* border: 1px solid green; */
+    width: fit-content;
+    cursor: pointer;
+}
+
+.amount{
+    border: 1px solid #1F4D93;
+    height: 100%;
+    /* width: 55px; */
+    width: fit-content;
+    background-color: white;
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+}
+#amma{
+    /* width: 30px; */
+    height: 30px;
+}
+.inps{
+    height:90%;
+    border-radius:5px;
+    border:none;
+    outline:none;
+    padding-left:10px;
+}
+#poop{
+    display: flex;
+    justify-content: space-between;
+    /* border: 1px solid  red; */
+    width: 100%;
+    margin-top: 5px;
+    margin-left: -30px;
+}
+.conple{
+    /* border: 1px solid; */
+    color: white;
+    font-size: 11px;
+    margin: 5px;
+}
+.flow{
+    border-bottom: 1px solid rgb(202, 202, 202);
+    padding: 10px;
+    cursor: pointer;
+}
+.flow:hover{
+    background-color: rgb(202, 202, 202);
+}
+         
+         
+.countmult{
+    /* border: 1px solid; */
+    width: 180px;
+    display: flex;
+    justify-content: space-between;
+}
+.butty, .butty2{
+    border:none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 20px;
+    background-color: white;
+
+}
+.rowTable{
+    /* border: 1px solid; */
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.mode{
+    padding: 15px;
+    box-sizing: border-box;
+}
+.gnamex{
+    font-weight: 900;
+    color: #2C3E5D;
+}
+.gnametotal{
+    color: #ED712E;
+    font-weight: 900;
+}
+.textname{
+    color: gray;
+}
+
+.textnamere{
+    font-weight: 900;
+    color: #2C3E5D;
+}
+
+
+#but{
+    border: none;
+    padding: 10px;
+    width: 100px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 900;
+}
+.cen{
+  /* border: 1px solid; */
+  display: flex;
+  width: fit-content;
+  align-self: center;
+  margin: auto;
+  gap: 10px;
+  margin-top: 20px;
+}
+.track{
+    background-color: #1F4D93;
+    color: white;
+    cursor: pointer;
+}
+.bet{
+    background-color: #ED712E;
+    color: white;
+    cursor: pointer;
+
+}
+.bet:hover{
+    background-color: #e96118;
+    color: white;
+    cursor: pointer;
+}
+
+@media screen and (max-width:1440px) {
+    .container{
+        width: 71vw;
+        left: 7.5vw;
+    }
+}
