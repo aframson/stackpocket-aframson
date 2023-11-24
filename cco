@@ -1,0 +1,402 @@
+//@ts-nocheck
+import React, { useEffect, useState } from "react";
+import styles from "./page.module.css";
+import { IoMdArrowDropdown } from "react-icons/io";
+import {
+  actualProfitBet,
+  actualProfitBetNew,
+  fixArithmetic,
+  onAmountBetset,
+  setQuat
+} from "@/functions/msc";
+import toast, { Toaster } from "react-hot-toast";
+import { MainStateProvider } from "@/StateContex";
+import { Popover, Text, Button, Modal } from "@mantine/core";
+import useStandardControlBoard from "./ControlBoardLayout";
+import { useDisclosure } from "@mantine/hooks";
+import StandardBetmodal from "./Betmodal/index";
+import Track from "./Track/index";
+import Notify2 from "@/components/Shared/Notify2"
+
+const unitList: number[] = [2, 1, 0.2, 0.1, 0.02, 0.01, 0.002, 0.001];
+const multipylist: number[] = [1, 5, 10, 20, 30, 40, 50, 100];
+
+interface QuaterItem {
+  name: string;
+  value: number;
+}
+
+const quater: QuaterItem[] = [
+  { name: "1/2", value: 0.5 },
+  { name: "1/3", value: 1 / 3 },
+  { name: "1/4", value: 0.25 },
+  { name: "All In", value: 1 },
+  { name: "None", value: 0 }
+];
+
+function ControlBoard({ lottery_name }: { lottery_name: string }) {
+  const { drawData, userData, setDrawData, lotteryData, setLotteryData } =
+    MainStateProvider();
+  const {
+    totalBetAmt,
+    totalBetsCalc,
+    multiplier,
+    setMultiplier,
+    unit,
+    setUnit,
+    quatar,
+    setQuatar,
+    handleAddToCart,
+    bet,
+    trackBet,
+    opened,
+    open,
+    close,
+    setTrack,
+    openTrack
+  }: any = useStandardControlBoard();
+
+  const [AmountBet, setBetAmount] = useState<string>("");
+  // const [opened, { open, close }] = useDisclosure(false);
+  // const [openTrack, setTrack] = useState(false);
+  // const [closeTrack, setCloseTrack] = useState(false);
+
+  useEffect(() => {
+    if (AmountBet !== "") {
+      setBetAmount("");
+      setMultiplier(1);
+      setUnit(2);
+      setQuatar([]);
+    }
+  }, [lotteryData.lottery_games_id]);
+
+  const handleTrack = () => {
+    console.log("shkhdskhhsdhkhskdhkhdsh");
+    trackBet();
+    setTrack(!openTrack);
+    // open()
+  };
+  // useEffect(() => {
+  //   setLotteryData({ ...lotteryData, lottery_name: lottery_name });
+  //   console.log("drawData:", drawData);
+  // }, [lotteryData.lottery_games_id]);
+
+  // useEffect(() => {
+  //   setLotteryData({ ...lotteryData, lottery_name: lottery_name });
+  // }, []);
+
+const handleBetNowClick = () => {
+ 
+  if(userData.balance <= 0){
+    Notify2("Insufficient funds, Kindly top up your wallet","bottom-center","error")
+    return
+  }else if(userData.balance < totalBetAmt){
+    Notify2("Insufficient funds, Kindly top up your wallet","bottom-center","error")
+    return
+  }
+  open()              
+}
+
+  return (
+    <>
+      <div className={styles.container}>
+        <div className={styles.controlpane}>
+          <div className={styles.itempane}>
+            <Popover
+              width={"fit-content"}
+              position="right"
+              withArrow
+              shadow="sm"
+            >
+              <Popover.Target>
+                <div className={styles.bool}>
+                  <div className={styles.pre}>Period</div>
+                  <div className={styles.prebox}>
+                    <div className={styles.predate}>{drawData.nextBetId}</div>
+                    <IoMdArrowDropdown
+                      className={styles.arrow}
+                      size={20}
+                      color="white"
+                    />
+                  </div>
+                </div>
+              </Popover.Target>
+              <Popover.Dropdown style={{ padding: 0 }}>
+                <Text style={{ padding: 0 }} size="sm">
+                  {drawData.drawPeriods.map((x: any, i: number) => (
+                    <div
+                      key={i}
+                      className={styles.flow}
+                      onClick={() => setDrawData({ ...drawData, nextBetId: x })}
+                    >
+                      {x}
+                    </div>
+                  ))}
+                </Text>
+              </Popover.Dropdown>
+            </Popover>
+          </div>
+          <div className={styles.itempane}>
+            <div className={styles.bool}>
+              <div className={styles.pre}>Amount</div>
+              <div className={styles.multiamount}>
+                {unitList.map((number, index) => (
+                  <button
+                    style={{
+                      color: unit === number ? "red" : "",
+                      boxShadow:
+                        unit === number
+                          ? "inset 0px 2px 3px #00000029, 0px 3px 2px #bebebe29"
+                          : "",
+                      borderRadius:
+                        index === 0
+                          ? "50px 0 0 50px"
+                          : index === 7
+                          ? "0 50px 50px 0"
+                          : 0
+                    }}
+                    className={styles.amount}
+                    key={index}
+                    onClick={() => {
+                      setUnit(number);
+                      setLotteryData({ ...lotteryData, unit: number });
+                      // setQuatar([]);
+                      // setBetAmount("");
+                    }}
+                  >
+                    {number}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className={styles.itempane}>
+            <div className={styles.bool}>
+              <div id={styles.prex} className={styles.pre}>Bet Amount</div>
+              <div className={styles.amountenter}>
+                <input
+                  disabled={totalBetsCalc === 0}
+                  value={AmountBet}
+                  onChange={(e) => {
+                    onAmountBetset(
+                      e,
+                      setUnit,
+                      setBetAmount,
+                      totalBetsCalc,
+                      toast,
+                      setMultiplier,
+                      unit
+                    );
+                  }}
+                  className={styles.inps}
+                  type="text"
+                  placeholder="Enter Bet Amount"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className={styles.controlpane}>
+          <div className={styles.itempane}>
+            <div className={styles.bool}>
+              <div className={styles.pre}>Bonus</div>
+              <div className={styles.prebox}>
+                <div className={styles.predate}>90.00%-0%</div>
+                <IoMdArrowDropdown
+                  className={styles.arrow}
+                  size={20}
+                  color="white"
+                />
+              </div>
+            </div>
+          </div>
+          <div className={styles.itempane}>
+            <div className={styles.bool}>
+              <div  className={styles.pre}>Multiply</div>
+              <div className={styles.multiamount}>
+                {multipylist.map((number, index) => (
+                  <button
+                    style={{
+                      color: multiplier === number ? "red" : "",
+                      boxShadow:
+                        multiplier === number
+                          ? "inset 0px 2px 3px #00000029, 0px 3px 2px #bebebe29"
+                          : "",
+                      borderRadius:
+                        index === 0
+                          ? "50px 0 0 50px"
+                          : index === 7
+                          ? "0 50px 50px 0"
+                          : 0
+                    }}
+                    className={styles.amount}
+                    key={index}
+                    onClick={() => {
+                      setMultiplier(number);
+                      setBetAmount("");
+                    }}
+                  >
+                    X{number}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className={styles.itempane}>
+            <div className={styles.bool}>
+              <div id={styles.prex} className={styles.pre}>Miltiply Bet </div>
+              <div className={styles.countmult}>
+                <button
+                  className={styles.butty}
+                  onClick={() => {
+                    setBetAmount("");
+                    setMultiplier(Math.max(1, multiplier - 1));
+                  }}
+                >
+                  -
+                </button>
+                <button className={styles.unit}>X{multiplier}</button>
+                <button
+                  className={styles.butty2}
+                  onClick={() => {
+                    setBetAmount("");
+                    setMultiplier(Math.min(9999, multiplier + 1));
+                  }}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className={styles.controlpanex}>
+          <div className={styles.boolas}>
+            <div className={styles.pre}>model</div>
+            <div className={styles.multiamount}>
+              {quater.map((number, index) => (
+                <button
+                  style={{
+                    color: quatar === number.value ? "red" : "",
+                    boxShadow:
+                      quatar === number.value
+                        ? "inset 0px 5px 5px #00000029, 0px 3px 2px #bebebe29"
+                        : "",
+                    borderRadius:
+                      index === 0
+                        ? "50px 0 0 50px"
+                        : index === 4
+                        ? "0 50px 50px 0"
+                        : 0
+                  }}
+                  id={styles.amma}
+                  className={styles.amount}
+                  key={index}
+                  onClick={() => {
+                    setQuat(
+                      number.value,
+                      setUnit,
+                      setQuatar,
+                      setMultiplier,
+                      setBetAmount,
+                      toast,
+                      totalBetsCalc,
+                      userData.balance
+                    );
+                  }}
+                >
+                  {number.name} 
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className={styles.itempane}>
+            <div className={styles.boola}>
+              <div id={styles.poop} className={styles.calculatequatar}>
+                <div className={styles.conple}>
+                  <span style={{ color: "#FFE200" }}> {totalBetsCalc} </span>{" "}
+                  Notes Total{" "}
+                </div>
+                <div className={styles.conple}>
+                  <span style={{ color: "#FFE200" }}>
+                    {fixArithmetic(totalBetAmt)}
+                  </span>{" "}
+                  yuan {totalBetsCalc ? `, each bet: ${unit} yuan ` : null}{" "}
+                </div>
+                <div className={styles.conple}>
+                  {"Highest profit "}
+                  <span style={{ color: "#FFE200", fontWeight: "bold" }}>
+                    {" "}
+                    0
+                    {/* {totalBetsCalc &&
+                    actualProfitBetNew(
+                      userPrize,
+                      totalBetAmt,
+                      multiplier,
+                      selections
+                    )} */}
+                  </span>{" "}
+                  {" yuan"}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className={styles.itempane}>
+            <div style={{ gap: 10 }} id={styles.bool}>
+              <Button
+                variant="outline"
+                style={{
+                  width: "100%",
+                  color: "white",
+                  border: "1px solid white",
+                  height:30
+                }}
+                size="sm"
+                color="white"
+                disabled={totalBetsCalc === 0}
+                onClick={handleAddToCart}
+              >
+                Add to Cart 
+              </Button>
+              <Button
+                bg={"#A0D62B"}
+                style={{ width: "100%" ,
+                height:30
+              
+              }}
+                size="sm"
+                color="blue"
+                onClick={handleTrack}
+                disabled={totalBetsCalc === 0}
+              >
+                Track
+              </Button>
+            
+              <Button
+                onClick={handleBetNowClick}
+                bg={"#ED712E"}
+                style={{ width: "100%",
+                height:30
+              }}
+                size="sm"
+                color="blue"
+                disabled={totalBetsCalc === 0}
+              >
+                Bet Now
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <StandardBetmodal
+        lotteryData={lotteryData}
+        bet={bet}
+        opened={opened}
+        close={close}
+      />
+
+      {/* <Track opened={openTrack} close={setTrack} /> */}
+    </>
+  );
+}
+
+export default ControlBoard;
