@@ -1,0 +1,142 @@
+import React, { useEffect } from "react";
+import styled from "./page2.module.css";
+import styles from "./page.module.css";
+import { MainStateProvider } from "@/StateContex";
+import { ACTION_TYPES } from "@/games/5d/stateActions";
+import { calculatedUserPrize, filterObjectSelections, generateCombinations, selectedPrizes, updatePrizeDisplay } from "@/functions/msc";
+import TooltipMa from "./TooltipMa";
+import { AiFillQuestionCircle } from 'react-icons/ai'
+import useStandardControlBoard from "@/components/BetStatistics/Standard/ControlBoardLayout";
+export default function DragonTigerTie() {
+  const { standardSelections, standardSelectionsDispatch, game_type_name } = MainStateProvider();
+  const { rebate, unit, setUserPrize }: any = useStandardControlBoard();
+  // yess
+  const DTT = [
+    {
+      name: "Dragon",
+      odds: 2.222,
+      id: 1,
+    },
+    {
+      name: "Tiger",
+      odds: 2.222,
+      id: 2,
+    },
+    {
+      name: "Tie",
+      odds: 10.0,
+      id: 3,
+    },
+  ];
+
+  const small = DTT.reduce((acc, curr) => Math.min(acc, curr.odds), Infinity)
+  const big = DTT.reduce((acc, curr) => Math.max(acc, curr.odds), -Infinity)
+
+  const combArr = generateCombinations([1, 2, 3, 4, 5], 2);
+  const nameData = ["1st", "2nd", "3rd", "4th", "5th"];
+  const data = combArr.map((arr) => {
+    let type = arr.join("v");
+    return { type, name: nameData[arr[0] - 1] + " V " + nameData[arr[1] - 1] };
+  });
+
+  //   function bzxxcx() {
+  //     console.log("dragontigertie", data);
+  //   }
+  const dragonTiger = [data.slice(0, 5), data.slice(5)];
+
+  useEffect(() => {
+    //empty selectedPrizes array when tab changes
+    selectedPrizes.splice(0, selectedPrizes.length)
+  }, [game_type_name])
+
+  const getTooltipContent = (itemName: any, name: any) => {
+    let tooltipContent = "";
+    if (itemName === "Dragon") {
+      tooltipContent = name.replace("V", ">")
+    } else if (itemName === "Tiger") {
+      tooltipContent = name.replace("V", "<")
+    } else {
+      tooltipContent = name.replace("V", "=")
+    }
+    return tooltipContent + " as " + `${name}-${itemName}`;
+  };
+
+  return (
+    <div
+
+      // style={{ width: "fit-content" }} 
+      className={styles.container2}>
+      <div className={styles.containergo}>
+        <div className={styles.butline}>
+          {dragonTiger.map((dt, x) => (
+            <div key={x}  >
+              {dt.map(({ name, type }, i) => (
+                <div key={i} className={styles.posa}>
+                  <div className={styles.posdf}>
+                    {name}
+                  </div>
+                  {DTT.map((item, x) => (
+                    <button key={x} className={`${styles.fgt} ${filterObjectSelections(standardSelections)?.[type]?.includes(item.id) ? styles.selected : ""}`}
+                      onClick={() => {
+                        console.log("ochapo=====>", item.odds);
+                        // updatePrizeDisplay(item.odds, unit, userData, type, item.name, setUserPrize, small, big)
+                        const prizeRange = updatePrizeDisplay(item.odds, unit, rebate, type, item.name, small, big)
+                        console.log("updatePrizeDisplay", prizeRange)
+                        setUserPrize(prizeRange)
+                        standardSelectionsDispatch({
+                          type: ACTION_TYPES.DRAGON_TIGER,
+                          payload: {
+                            game_id: item.name, // same as name
+                            userSelection: item.id, // same as id
+                            rowId: type, // same as type
+                          },
+                        });
+                      }}
+                    >
+                      <div className={styles.qu}>
+                        <AiFillQuestionCircle size={20} />
+                        <TooltipMa className={styles.forceTopTooltip} content={getTooltipContent(item.name, name)} isHover={true}>
+                          <div
+                            className={styles.tooltipContainer}
+                          >
+                            <div
+                              className={styles.tooltipTrigger}
+                            >
+                              ?
+                            </div>
+                          </div>
+                        </TooltipMa>
+                      </div>
+                      <div className={styles.name}>{item.name}</div>
+                      <div className={styles.odds}>{calculatedUserPrize(item.odds, unit, rebate)}</div>
+                    </button>
+                  ))}
+                </div>
+
+              ))}
+            </div>
+          ))}
+        </div>
+        {/* 
+        <div className={styles.butline}>
+          {new Array(5).fill(0).map((item, i) => (
+            <div key={i} className={styles.posa}>
+              <div className={styles.posdf}>1st V 2nd</div>
+              {DTT.map((item, x) => (
+                <div key={x} className={styles.fgt}>
+                  <div className={styles.qu}>
+                    <AiFillQuestionCircle size={20} />
+                  </div>
+                  <div className={styles.name}>{item.name}</div>
+                  <div className={styles.odds}>{item.odds}</div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div> */}
+      </div>
+
+
+    </div>
+  );
+}
