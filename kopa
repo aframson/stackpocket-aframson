@@ -1,0 +1,149 @@
+import { useSession } from 'next-auth/react'
+import React, { useEffect } from 'react'
+import HeaderLogin from '../../pages/login/HeaderLogin'
+import styles from './page.module.css'
+import NavigationUserDetails from '../User/NavigationUserDetails'
+import { MainStateProvider } from '@/StateContex'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import Image from 'next/image'
+import logo from '..//..///../public//Assets/2.png'
+import { useUserData } from '@/hooks/fetchUserData'
+import { Skeleton, Button } from '@mantine/core'
+import { BeatLoader } from 'react-spinners'
+import Loading from 'react-loading'
+
+
+
+
+const NavigationLinks = [
+  {
+    name: 'Home',
+    link: '/'
+  },
+  {
+    name: 'Games',
+    link: '/game'
+  },
+  {
+    name: 'Sports',
+    link: '#'
+  },
+  {
+    name: 'Casino',
+    link: '#'
+  },
+  {
+    name: 'Lottery',
+    link: '#'
+  },
+  {
+    name: 'Jackport',
+    link: '#'
+  },
+  {
+    name: 'Chess and Card',
+    link: '#'
+  },
+]
+
+
+function Navigation({ otp_enabled }: { otp_enabled: any }) {
+
+  // const { activelinks, setActiveLinks } = MainStateProvider()
+  const router = useRouter()
+  const { data: session } = useSession() as { data: any }
+  const token = session?.user?.name?.token
+  const hasUserEnable2fa = session?.user?.name.auth_type
+  const { data, isError, isFetching, isLoading, refetch, isSuccess: recentData } = useUserData(token)
+
+  const show = !hasUserEnable2fa ? true : otp_enabled === "0" ? true : false
+
+
+  useEffect(() => {
+    if (session) {
+      refetch()
+    }
+    // console.log("dfdfdfd",session)
+  }, [data])
+
+
+
+
+  // step 2:
+
+  return (
+    <>
+      {/* {JSON.stringify(data?.userinfo)} */}
+      {isLoading?(
+        <div className={styles.cov}>
+          <div className={styles.load}>
+           
+          <center>
+            <div > 
+              Loading ...
+            </div> 
+           <br/>
+              <Loading type="spin" color="white" height={30} width={30}/>
+           </center>
+          </div>
+        </div>     
+      ):null}
+      <div className={styles.container}>
+        <div className={styles.sec}>
+          {/* <div className={styles.logo}>
+               menu
+            </div> */}
+
+          <div className={styles.logomain}>
+            <div className={styles.logo}>
+              <Image
+                src={logo}
+                alt="Picture of the author"
+                width={100}
+                height={100}
+                className={styles.img}
+              />
+            </div>
+            Enzer Games
+          </div>
+        </div>
+        <div className={styles.sec}>
+          <ul className={styles.ul}>
+            <li className={styles.li}>
+              {NavigationLinks.map((link, index) => (
+                <Link className={styles.a} key={index} href={link.link}>
+                  {link.name}
+                </Link>
+              ))}
+            </li>
+          </ul>
+        </div>
+        <div className={styles.sec}>
+          <div className={styles.authitem}>
+            {
+              <div>
+                {/* {Object.values(data?.userinfo ?? {}).length > 0 ? (
+               show && <NavigationUserDetails session={session} />) : (<HeaderLogin />)
+              } */}
+
+                {session ?
+                  <div style={{display:"flex",justifyContent:"center",alignItems:"center"}}>
+                     {isLoading ? <BeatLoader color="snow" />: <NavigationUserDetails
+                      session={session}
+                      otpValue={data?.userinfo?.otp_enabled}
+                      auth_type={data?.userinfo?.auth_type}
+                    />}
+                  </div>
+                  : <HeaderLogin />
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
+export default Navigation
