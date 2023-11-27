@@ -1,0 +1,139 @@
+import React from 'react'
+import styles from './page.module.css'
+import PrizeHeader from '../../PrizeHeader'
+// import { mainStateProvider } from '@/StateContex'
+import { useSession } from 'next-auth/react'
+import { calculatedUserPrize, defaultUserPrize, selectArray, updatePrizeDisplay } from '@/functions/msc'
+import { MainStateProvider } from '@/StateContex'
+import { ACTION_TYPES } from '@/games/5d/stateActions'
+import useStandardControlBoard from '@/components/BetStatistics/Standard/ControlBoardLayout'
+
+
+// const {lotteryData,userData} = mainStateProvider()
+
+
+const BullBullMenu = [
+  {
+    name: "Bull Big",
+    odds: 3.081,
+    id: 1,
+  },
+  {
+    name: "Bull Small",
+    odds: 3.088,
+    id: 2,
+  },
+  {
+    name: "Bull Odd",
+    odds: 3.114,
+    id: 3,
+  },
+  {
+    name: "Bull Even",
+    odds: 3.056,
+    id: 4,
+  },
+  {
+    name: "No Bull",
+    odds: 2.784,
+    id: 5,
+  },
+  {
+    name: "Bull 1",
+    odds: 15.569,
+    id: 6,
+  },
+  {
+    name: "Bull 2",
+    odds: 15.257,
+    id: 7,
+  },
+  {
+    name: "Bull 3",
+    odds: 15.569,
+    id: 7,
+  },
+  {
+    name: "Bull 4",
+    odds: 15.257,
+    id: 7,
+  },
+  {
+    name: "Bull 5",
+    odds: 15.569,
+    id: 7,
+  },
+  {
+    name: "Bull 6",
+    odds: 15.257,
+    id: 7,
+  },
+  {
+    name: "Bull 7",
+    odds: 15.569,
+    id: 7,
+  },
+  {
+    name: "Bull 8",
+    odds: 15.257,
+    id: 7,
+  },
+  {
+    name: "Bull 9",
+    odds: 15.569,
+    id: 7,
+  },
+  {
+    name: "Bull Bull",
+    odds: 15.373,
+    id: 7,
+  },
+];
+// const {data:session} = useSession()
+
+// const prize = userData? calculatedUserPrize(lotteryData.currentOdds, lotteryData.unit, session?.user?.name?.rebate): defaultUserPrize(lotteryData.currentOdds, lotteryData.unit);
+const small = BullBullMenu.reduce((acc, curr) => Math.min(acc, curr.odds), Infinity)
+const big = BullBullMenu.reduce((acc, curr) => Math.max(acc, curr.odds), -Infinity)
+
+
+function BullBull() {
+  const { standardSelections, standardSelectionsDispatch,  lotteryData } = MainStateProvider();
+  const { rebate, unit, setUserPrize }: any = useStandardControlBoard();
+
+  return (
+    <div className={styles.conty}>
+      {/* <PrizeHeader title={lotteryData.gameGroupName} /> */}
+      <div className={styles.buodert}>
+        {BullBullMenu.map((item: any, index: any) => {
+          const indexData = index + 16;
+          const isSelected = standardSelections[selectArray(1)]?.includes(indexData);
+          return (
+            <button key={index}
+              className={`${styles.boop} ${isSelected ? styles.selected : ''}`}
+              onClick={() => {
+               const prizeRange =  updatePrizeDisplay(item.odds, unit, rebate, item.name, item.name, small, big)
+               console.log("updatePrizeDisplay",prizeRange)
+               setUserPrize(prizeRange)
+                standardSelectionsDispatch({
+                  type: ACTION_TYPES.ON_SELECT,
+                  payload: {
+                    rowId: selectArray(1),
+                    userSelection: [indexData],
+                    // game_id: items,
+                  },
+                });
+              }}
+
+            >
+              <div className={styles.buioza}>{item.name}</div>
+              <div className={styles.buio}>{calculatedUserPrize(item.odds, unit, rebate)}</div>
+            </button>
+          )
+        }
+        )}
+      </div>
+    </div>
+  )
+}
+
+export default BullBull
