@@ -1,0 +1,120 @@
+//@ts-nocheck
+import React from 'react'
+import styles from './page.module.css'
+import { MainStateProvider } from '@/StateContex'
+import { BsFillQuestionCircleFill } from 'react-icons/bs'
+import { Radio } from '@mantine/core'
+import PrizeHeader from '../../PrizeHeader'
+import { useSession } from 'next-auth/react'
+import { calculatedUserPrize, defaultUserPrize, selectArray } from '@/functions/msc'
+import { ACTION_TYPES } from '@/games/5d/stateActions'
+import { CSSProperties } from '@emotion/serialize'
+import Index from '@/components/BoardGames'
+
+
+function BSOE({
+  standardSelections, standardSelectionsDispatch
+}: any) {
+
+
+  const { lotteryData, userData } = MainStateProvider()
+  const { data: session } = useSession()
+
+  const CardButtons = [
+    {
+      name: 'Big',
+      color: 'red'
+
+    },
+    {
+      name: 'Small',
+      color: '#0088FF'
+    },
+    {
+      name: 'Odd',
+      color: '#83583C'
+    },
+    {
+      name: 'Even',
+      color: '#FF7D26'
+    },
+  ]
+
+
+  const GameId: any = {
+    115: 2,
+    116: 3,
+    117: 2,
+    118: 3,
+    119: 1,
+    120: 3,
+  }
+
+  function addNumberSuffix(n: number) {
+    // if (n >= 11 && n <= 13) {
+    //   return n + "th";
+    // }
+    const lastDigit = n % 10;
+    switch (lastDigit) {
+      case 1:
+        return n + "st";
+      case 2:
+        return n + "nd";
+      case 3:
+        return n + "rd";
+      default:
+        return n + "th";
+    }
+  }
+
+
+  function generateNumbersBetween(start: number, end: number) {
+    if (start <= end) {
+      return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    } else {
+      return [];
+    }
+  }
+
+  const prize = userData ? calculatedUserPrize(lotteryData.currentOdds, lotteryData.unit, session?.user?.name?.rebate) : defaultUserPrize(lotteryData.currentOdds, lotteryData.unit);
+
+
+  return (
+    <div>
+      {/* {lotteryData.endingPoint - lotteryData.endingPoint} */}
+      {/* <PrizeHeader title={lotteryData.gameGroupName} /> */}
+{/* dfgdfg {JSON.stringify(standardSelections)} {lotteryData.startingPoint}, {lotteryData.endingPoint} */}
+      {generateNumbersBetween(lotteryData.startingPoint, lotteryData.endingPoint).map((rowId, index) => (
+        <div key={index} className={styles.caldflow}>
+          <div className={styles.title}>{addNumberSuffix(rowId)}</div>
+          {CardButtons.map((item: any, index: any) => (
+            <button 
+            
+            style={{ color: item.color } } 
+            // className={styles.buu} 
+            key={index}
+              onClick={() => {
+                standardSelectionsDispatch({
+                  type: ACTION_TYPES.ON_SELECT,
+                  payload: {
+                    game_id: item.name, // same as name
+                    userSelection: [index+ 1], // same as id
+                    rowId: selectArray(rowId), // same as type
+                  },
+                });
+              }}
+              className={`${styles.buu} ${
+            standardSelections[selectArray(rowId)]?.includes(index + 1) ? styles.selectedButton : ''
+          }`}
+            >
+              {item.name}
+            </button> 
+          ))}
+        </div>
+      ))}
+
+    </div>
+  )
+}
+
+export default BSOE
