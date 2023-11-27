@@ -1,0 +1,91 @@
+import useStandardControlBoard from '@/components/BetStatistics/Standard/ControlBoardLayout'
+import { calculatedUserPrize, filterObjectSelections, updatePrizeDisplay } from '@/functions/msc'
+import { ACTION_TYPES } from '@/games/5d/stateActions'
+import { MainStateProvider } from '@/StateContex'
+import React from 'react'
+import styles from './page.module.css'
+
+
+
+const ThreeCardsMenu = [
+    {
+        name: "TOAK",
+        odds: 99.25,
+        id: 1,
+    },
+    {
+        name: "Streak",
+        odds: 16.5416,
+        id: 2,
+    },
+    {
+        name: "Pair",
+        odds: 3.6759,
+        id: 3,
+    },
+    {
+        name: "Mixed 6",
+        odds: 3.389,
+        id: 4,
+    },
+    {
+        name: "Half Streak",
+        odds: 2.859,
+        id: 5,
+    },
+];
+
+const Name: any = { 0: 'First 3', 1: 'Middle 3', 2: "Last 3" }
+const small = ThreeCardsMenu.reduce((acc, curr) => Math.min(acc, +curr.odds), Infinity)
+const big = ThreeCardsMenu.reduce((acc, curr) => Math.max(acc, +curr.odds), -Infinity)
+
+function ThreeCards() {
+    // const {} = MainStateProvider();
+    const { standardSelections, standardSelectionsDispatch } = MainStateProvider();
+    const { rebate, unit, setUserPrize }: any = useStandardControlBoard();
+
+    return (
+        <div className={styles.conty}>
+            {/* {JSON.stringify(standardSelections)} */}
+
+            {new Array(3).fill(0).map((item: any, index: any) => (
+                <div key={index} className={styles.buodert}>
+                    <div className={styles.buotxt}>{Name[index]}.</div>
+                    {ThreeCardsMenu.map((item: any, ind: any) => {
+                        const indexData = ind + 11;
+                        return (
+                            <button key={ind}
+                                // className={styles.boop}
+                                className={`${styles.boop} ${filterObjectSelections(standardSelections)[Name[index]]?.includes(indexData) ? styles.selected : ""}`}
+
+                                onClick={() => {
+                                    // updatePrizeDisplay(item.odds, unit, userData, Name[index], item.name, setUserPrize, small, big)
+                                    const prizeRange = updatePrizeDisplay(item.odds, unit, rebate, item.name, item.name, small, big)
+                                    console.log("updatePrizeDisplay", prizeRange)
+                                    setUserPrize(prizeRange)
+                                    standardSelectionsDispatch({
+                                        type: ACTION_TYPES.DRAGON_TIGER,
+                                        payload: {
+                                            game_id: item.name, // same as name
+                                            userSelection: indexData, // same as id
+                                            rowId: Name[index], // same as type
+                                        },
+                                    });
+                                }}
+                            >
+                                <div className={styles.buioza}>{item.name}</div>
+                                <div className={styles.buio}>{calculatedUserPrize(item.odds, unit, rebate)}</div>
+                            </button>
+                        )
+                    }
+                    )}
+                </div>
+            )
+
+            )}
+
+        </div>
+    )
+}
+
+export default ThreeCards
