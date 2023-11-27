@@ -1,0 +1,112 @@
+import useStandardControlBoard from "@/components/BetStatistics/Standard/ControlBoardLayout";
+import {
+    calculatedUserPrize,
+    filterObjectSelections,
+    selectArray,
+    updatePrizeDisplay,
+} from "@/functions/msc";
+import { ACTION_TYPES } from "@/games/5d/stateActions";
+import { MainStateProvider } from "@/StateContex";
+import React from "react";
+import styles from "./page.module.css";
+
+const StudMenu = [
+    {
+        name: "Four of a kind",
+        odds: 222.222,
+        id: 1,
+    },
+    {
+        name: "Gourd",
+        odds: 110.278,
+        id: 2,
+    },
+    {
+        name: "Streak",
+        odds: 83.333,
+        id: 3,
+    },
+    {
+        name: "Three of a Kind",
+        odds: 13.889,
+        id: 4,
+    },
+    {
+        name: "2 Pairs",
+        odds: 9.259,
+        id: 5,
+    },
+    {
+        name: "1 Pair",
+        odds: 1.984,
+        id: 6,
+    },
+    {
+        name: "High Card",
+        odds: 3.444,
+        id: 7,
+    },
+];
+
+const small = StudMenu.reduce(
+    (acc: any, curr: any) => Math.min(acc, curr.odds),
+    Infinity
+);
+const big = StudMenu.reduce(
+    (acc: any, curr: any) => Math.max(acc, curr.odds),
+    -Infinity
+);
+function Stud() {
+    const [selected, setSelected] = React.useState([]);
+    const { standardSelections, standardSelectionsDispatch } = MainStateProvider();
+    const { rebate, unit, setUserPrize }: any = useStandardControlBoard();
+
+    React.useEffect(() => {
+        console.log("SELE:", selected);
+        const data = selected.map((element) => [element]);
+        console.log("data: ", data);
+    }, [selected]);
+    return (
+        <div className={styles.conts}>
+            {StudMenu.map((item: any, index: any) => {
+                const indexData = index + 4;
+                // const isPart = selected.includes(indexData);
+                return (
+                    <button
+                        key={index}
+                        // className={styles.boop}
+                        className={`${styles.boop} ${standardSelections[selectArray(1)]?.includes(indexData)
+                            ? styles.selected
+                            : ""
+                            }`}
+                        onClick={() => {
+                            // updatePrizeDisplay(item.odds, unit, userData, item.name, item.name, setUserPrize, small, big)
+                            const prizeRange =  updatePrizeDisplay(item.odds, unit, rebate, item.name, item.name, small, big)
+                            console.log("updatePrizeDisplay",prizeRange)
+                            setUserPrize(prizeRange)
+                            standardSelectionsDispatch({
+                                type: ACTION_TYPES.ON_SELECT,
+                                payload: {
+                                    rowId: selectArray(1),
+                                    userSelection: [indexData],
+                                    // game_id: items,
+                                },
+                            });
+                        }}
+                    >
+                        <div
+                         className={styles.buioza}
+                        >
+                            {item.name}
+                        </div>
+                        <div className={styles.buio}>
+                            {calculatedUserPrize(item.odds, unit, rebate)}
+                        </div>
+                    </button>
+                );
+            })}
+        </div>
+    );
+}
+
+export default Stud;
