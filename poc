@@ -1,0 +1,2900 @@
+//@ts-nocheck
+import { MainStateProvider } from "@/StateContex";
+import { ACTION_TYPES } from "@/games/5d/stateActions";
+import { GameData } from "@/interfaces/reducer";
+import { ChangeEvent } from "react";
+import { getNumCombinations } from "./betsCalculation";
+
+
+
+
+export let intervalMinutes: number = 1;
+// let drawData: any = {};
+
+export let gameData: Partial<GameData> = {
+  uid: 0,
+  gameId: 0,
+  unitStaked: 0,
+  totalBetAmt: 0,
+  multiplier: 1,
+  totalBets: 0,
+  betId: "",
+  allSelections: [],
+  userSelections: "",
+  game_label: "",
+};
+
+//here to be deleted by Richard
+// let drawData = {
+//   betId: "202305041362",
+//   drawDatetime: "2023-05-04 23:42:00",
+//   drawNumber: [8, 7, 4, 1, 0],
+//   timeLeft: 34,
+//   nextBetId: "202305041363",
+//   nextDrawDatetime: "2023-05-04 23:43:00",
+// };
+/**
+ * Selects the function to use for a given game.
+ * 
+ * @param game - The game object to determine the function for.
+ * @returns The function to use for the game.
+ */
+export function gameFunctionSelector(game: any): any {
+  if (game.name === "group60" || game.name === "group30") {
+    return allSelections;
+  }
+}
+
+/**
+ * Limits the length of the text and appends ellipsis if necessary.
+ * @param text - The text to limit.
+ * @param limit - The maximum length of the text.
+ * @returns The limited text with ellipsis if necessary.
+ */
+export function limitText(text: any, limit: number) {
+  if (text?.length > limit) {
+    text = text.substring(0, limit - 3) + "...";
+  }
+  return text;
+}
+
+/**
+ * Formats time in seconds to HH:MM:SS format.
+ * @param time - The time in seconds.
+ * @returns The formatted time string in HH:MM:SS format.
+ */
+export const formatTime = (time: any) => {
+  const hours = Math.floor(time / 3600)
+    .toString()
+    .padStart(2, "0");
+  const minutes = Math.floor((time % 3600) / 60)
+    .toString()
+    .padStart(2, "0");
+  const seconds = (time % 60).toString().padStart(2, "0");
+  return `${hours}:${minutes}:${seconds}`;
+};
+
+/**
+ * Converts seconds to minutes.
+ * @param sec - The time in seconds.
+ * @returns The time in minutes.
+ */
+export const convertSecToMin = (sec: any) => {
+  return sec / 60;
+};
+/**
+ * fixes some rounding off multiplication errors in javascript. eg. 0.356 *10 gives 3.5599999999999996 in javascript. function returns 3.56 in such case.
+ * @param {number} value data to fix
+ * @returns correct value after javascript multiplication.
+ */
+export const fixArithmetic = (value: any): number => {
+  // console.log(value);
+  return +value?.toFixed(8)
+};
+
+/**
+ * gets time in HH:MM:SS format
+ * @param {string} dateInput dateTime to return time from
+ * @returns time in HH:MM:SS format
+ */
+export const getTime = (dateInput: string) => {
+  let date = new Date(dateInput);
+  return (
+    String(date.getHours()).padStart(2, "0") +
+    ":" +
+    String(date.getMinutes()).padStart(2, "0") +
+    ":" +
+    String(date.getSeconds()).padStart(2, "0")
+  );
+};
+
+export const getTimeTwo = (objToday: Date) => {
+  let curHour = objToday.getHours() //> 12 ? objToday.getHours() - 12 : (objToday.getHours() < 10 ? "0" + objToday.getHours() : objToday.getHours());
+  let curMinute = objToday.getMinutes() < 10 ? "0" + objToday.getMinutes() : objToday.getMinutes();
+  let curSeconds = objToday.getSeconds() < 10 ? "0" + objToday.getSeconds() : objToday.getSeconds();
+  // let curMeridiem = objToday.getHours() > 12 ? "PM" : "AM";
+  //let curMeridiem = objToday.getHours()
+  let today = curHour + ":" + curMinute + ":" + curSeconds //+ curMeridiem;
+  return today;
+};
+
+/**
+ * gets date in YYYY-MM-DD format
+ * @param {string} date datetime to return date from
+ * @returns date in YYYY-MM-DD format
+ */
+export const getDate = (date: string): string => {
+  let dateObj = new Date(date);
+  return (
+    dateObj.getFullYear() +
+    "-" +
+    String(dateObj.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(dateObj.getDate()).padStart(2, "0")
+  );
+};
+/**
+ * gets the next bet id from the current one. Bet id is of the form '202501260002'(YYYYMMDD+IDDD)
+ * @param {string} currentBetId the current bet id eg '202501260002'
+ * @param {string} idDateTime the date time '@currentBetId' was generated
+ * @param {number} intervalMinutes interval of generation. useful in restarting bet generation on next day
+ * @returns next bet id
+ */
+export function generateNextBetId(
+  currentBetId: string,
+  idDateTime: string,
+  intervalMinute = intervalMinutes
+): string {
+  let startId: number = 1;
+  let appendedId: number = +String(currentBetId).slice(-4);
+  let nextGenerationDateTime: Date = addMinutes(idDateTime, intervalMinute);
+  let id: number = isNextDay(idDateTime, "" + nextGenerationDateTime)
+    ? startId
+    : +appendedId + 1;
+  return getBetId(nextGenerationDateTime, id);
+}
+
+/**
+ * Generates the draw periods based on the current bet ID, ID date time, and main time left.
+ * @param currentBetId The current bet ID.
+ * @param idDateTime The ID date time.
+ * @param mainTimeLeft The main time left in seconds.
+ * @returns An array of generated draw periods.
+ */
+export function generateDrawPeriods(currentBetId: string, idDateTime: string, mainTimeLeft: number) {
+  let drawPeriodsArr = [];
+  let intervalMinutes = convertSecToMin(mainTimeLeft);
+
+  for (let i = 0; i < 3; i++) {
+    currentBetId = generateNextBetId(
+      currentBetId,
+      idDateTime,
+      intervalMinutes
+    );
+    idDateTime = "" + addMinutes(idDateTime, intervalMinutes);
+    drawPeriodsArr.push(currentBetId);
+  }
+  // console.log("drawlist:", drawPeriodsArr);
+  return drawPeriodsArr;
+}
+
+/**
+ * appends bet id to datetime provided.
+ * @param {string} dateInput draw date time
+ * @param {string} id the id of the draw. counted from '1' at the beginning of the day.
+ * @returns formatted bet id
+ */
+function getBetId(dateInput: Date, id: number): string {
+  let date: Date = new Date(dateInput);
+  return (
+    date.getFullYear().toString() +
+    String(date.getMonth() + 1).padStart(2, "0") +
+    String(date.getDate()).padStart(2, "0") +
+    String(id).padStart(4, "0")
+  );
+}
+
+/**
+ * checks whether dates provided happens on different dates
+ * @param {string} checkDate does this date happens on the next day?
+ * @param {string} date control date. date to be compared to. Default value is "2023-03-08"
+ * @returns true or false. true if nextDay
+ */
+export function isNextDay(checkDate: string, date: string): boolean {
+
+  const date1 = new Date(date);
+  const date2 = new Date(checkDate);
+  if (date1.getDate() !== date2.getDate()) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Checks if a given betId is the current bet.
+ * @param {string} betId - The betId to check.
+ * @param {string} currentBetId - The current betId to compare against. Default is serverDrawNum.nextBetId.
+ * @returns {boolean} - Returns true if the given betId is the current bet, false otherwise.
+ */
+export function isCurrent(betId: string, currentBetId: string): boolean {
+  // console.log("betId", betId, "currentBetId", currentBetId)
+  return betId == currentBetId;
+}
+
+/**
+ * add some minutes to dateTime provided.
+ * @param {string} dateInput dateTime to add minutes to
+ * @param {number} minutes minutes to add. can be negative or positive.
+ * @returns new dateTime with minutes added. format 'YYYY-MM-DD HH:MM:SS'
+ */
+export function addMinutes(
+  dateInput: string,
+  minutes: number = intervalMinutes
+) {
+  let date = new Date(dateInput);
+  return new Date(date.getTime() + minutes * 60000);
+}
+/**
+ * Splits an array of numbers into smaller arrays based on their properties,
+ * and returns an object containing these arrays.
+ *
+ * @param {number} start - The starting index for selecting numbers from the array.
+ * @param {number} end - The ending index for selecting numbers from the array.
+ * @param {number[]} numbers - The array of numbers to split.
+ * @returns {Object} An object containing the following arrays:
+ * - small: An array of numbers smaller than the middle number in the selected range.
+ * - big: An array of numbers larger than the middle number in the selected range.
+ * - even: An array of even numbers in the selected range.
+ * - odd: An array of odd numbers in the selected range.
+ * - all: An array containing all numbers in the selected range.
+ * - buttons: An array containing only the selected range of numbers.
+ */
+export function splitNumbers(
+  start: number,
+  end: number,
+  numbers: Readonly<number[]>
+): any {
+  const buttons = numbers.slice(start, end + 1);
+  const small = buttons.slice(0, buttons.length / 2);
+  const big = buttons.slice(buttons.length / 2, buttons.length);
+  const even = buttons.filter((number: number) => number % 2 === 0);
+  const odd = buttons.filter((number: number) => number % 2 !== 0);
+  const all = numbers.slice(start, end + 1);
+
+  return { small, big, even, odd, all, buttons };
+}
+
+
+/**
+ * Converts a Date object to a formatted date-time string.
+ * @param date - The Date object to convert.
+ * @returns The formatted date-time string in the format "YYYY-MM-DD HH:MM:SS".
+ */
+export function getDateTime(date: Date) {
+  date = new Date(date);
+  return (
+    date.getFullYear() +
+    "-" +
+    String(date.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(date.getDate()).padStart(2, "0") +
+    " " +
+    String(date.getHours()).padStart(2, "0") +
+    ":" +
+    String(date.getMinutes()).padStart(2, "0") +
+    ":" +
+    String(date.getSeconds()).padStart(2, "0")
+  );
+}
+
+
+/**
+
+* Returns the corresponding row name based on the given row number.
+* @param {number} row - The row number.
+* @returns {string} The name of the row.
+*/
+export const selectArray = (row: number): string => {
+  let array: string;
+  if (row === 1) {
+    array = "firstRow";
+  } else if (row === 2) {
+    array = "secondRow";
+  } else if (row === 3) {
+    array = "thirdRow";
+  } else if (row === 4) {
+    array = "fourthRow";
+  } else {
+    array = "fifthRow";
+  }
+  return array;
+};
+
+// 2 sides tabs
+export const selectTabs = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th"]
+
+
+/**
+
+Dispatches an action based on the selected filter label and row id
+@param {string} label - the label of the selected filter
+@param {number} id - the id of the selected row
+@param {function} dispatch - the dispatch function from the Redux store
+@param {number[]} small - an array of small numbers to be used as a filter
+@param {number[]} big - an array of big numbers to be used as a filter
+@param {number[]} even - an array of even numbers to be used as a filter
+@param {number[]} odd - an array of odd numbers to be used as a filter
+@param {number[]} all - an array of all numbers to be used as a filter
+*/
+export const rowButtons = (
+  label: string,
+  id: number,
+  dispatch?: any,
+  small?: number[],
+  big?: number[],
+  even?: number[],
+  odd?: number[],
+  all?: number[],
+  game_name?: any
+) => {
+  if (label === "Even") {
+    dispatch({
+      type: ACTION_TYPES.EVEN,
+      payload: { rowId: selectArray(id), userSelection: even, game_name },
+    });
+  } else if (label === "Clear") {
+    dispatch({
+      type: ACTION_TYPES.CLEAR,
+      payload: { rowId: selectArray(id), userSelection: [], game_name },
+    });
+  } else if (label === "Odd") {
+    dispatch({
+      type: ACTION_TYPES.ODD,
+      payload: { rowId: selectArray(id), userSelection: odd, game_name },
+    });
+  } else if (label === "Small") {
+    dispatch({
+      type: ACTION_TYPES.SMALL,
+      payload: { rowId: selectArray(id), userSelection: small, game_name },
+    });
+  } else if (label === "Big") {
+    dispatch({
+      type: ACTION_TYPES.BIG,
+      payload: { rowId: selectArray(id), userSelection: big, game_name },
+    });
+  } else {
+    dispatch({
+      type: ACTION_TYPES.ALL_ROWS,
+      payload: { rowId: selectArray(id), userSelection: all, game_name },
+    });
+  }
+};
+
+/**
+ * Returns an object with the same array as the value for each property.
+ * 
+ * @param array - The array to be used as the value for each property.
+ * @returns An object with the same array as the value for each property.
+ */
+// export const reducerSelectionsArray = (array: any[]) => {
+// let a =  {
+//   firstRow: array,
+//   secondRow: array,
+//   thirdRow: array,
+//   fourthRow: array,
+//   fifthRow: array,
+// };
+// };
+
+/**
+ * Slice an object by keys between the start and end keys (inclusive)
+ * @param obj - The object to slice
+ * @param startKey - The starting key
+ * @param endKey - The ending key
+ * @returns The sliced object
+ */
+function sliceObjectByKeys<T extends Record<string, unknown>, K extends keyof T>(
+  obj: any,
+  startKey: any, //used to be K
+  endKey: any, //used to be K
+  endingPoint: any
+): Record<K, T[K]> {
+  const keys = Object.keys(obj) as any[];
+  const startIndex = keys.indexOf(startKey);
+  const endIndex = keys.indexOf(endKey);
+  if (startIndex < 0 || endIndex < 0) {
+    throw new Error('Start or end key not found');
+  }
+  const slicedObj = keys.reduce((acc, key, currIndex) => {
+    if (currIndex < endingPoint) {
+      acc[key] = obj[key];
+    } else {
+      acc[key] = [];
+    }
+    return acc;
+  }, {} as Record<K, T[K]>);
+  return slicedObj;
+}
+
+
+/**
+ * Reduces an array into an object by assigning the same array to multiple rows in the object.
+ * @param array - The array to be assigned to each row.
+ * @param startingPoint - The starting point of the rows to be assigned. (Optional)
+ * @param endingPoint - The ending point of the rows to be assigned. (Optional)
+ * @returns The object with rows assigned with the given array.
+ */
+export const reducerSelectionsArray = (array: any[], startingPoint?: any, endingPoint?: any) => {
+  let startKey = selectArray(startingPoint);
+  let endKey = selectArray(endingPoint)
+
+  let a = {
+    firstRow: array,
+    secondRow: array,
+    thirdRow: array,
+    fourthRow: array,
+    fifthRow: array,
+  };
+  const selectedObject = sliceObjectByKeys(a, startKey, endKey, endingPoint)
+
+  console.log("selectedObject", selectedObject)
+
+  return selectedObject;
+};
+
+
+/**
+ * Dispatch function for selecting/deselecting all rows.
+ *
+ * @param label - The label of the button clicked.
+ * @param small - Array of numbers representing the 'small' numbers.
+ * @param big - Array of numbers representing the 'big' numbers.
+ * @param even - Array of numbers representing the 'even' numbers.
+ * @param odd - Array of numbers representing the 'odd' numbers.
+ * @param all - Array of all the numbers.
+ * @param dispatch - The dispatch function from the context.
+ */
+export const ALL_ROWS_DISPATCH = (
+  label: string,
+  small: number[],
+  big: number[],
+  even: number[],
+  odd: number[],
+  all: number[],
+  startingPoint?: any,
+  endingPoint?: any,
+  dispatch?: any,
+) => {
+  // Check which button was clicked and dispatch the corresponding action.
+  if (label === "Clear") {
+    // Dispatch the 'CLEAR_ALL_ROWS' action with an empty array.
+    dispatch({
+      type: ACTION_TYPES.CLEAR_ALL_ROWS,
+      payload: reducerSelectionsArray([]),
+    });
+  } else if (label === "All") {
+    console.log("bismark opele ", reducerSelectionsArray(all, startingPoint, endingPoint))
+    // Dispatch the 'SELECT_ALL_ROWS' action with the 'all' array.
+    dispatch({
+      type: ACTION_TYPES.SELECT_ALL_ROWS,
+      payload: reducerSelectionsArray(all, startingPoint, endingPoint),
+    });
+  } else if (label === "Small") {
+    // Dispatch the 'SELECT_ALL_SMALL' action with the 'small' array.
+    dispatch({
+      type: ACTION_TYPES.SELECT_ALL_SMALL,
+      payload: reducerSelectionsArray(small, startingPoint, endingPoint),
+    });
+  } else if (label === "Big") {
+    // Dispatch the 'SELECT_ALL_BIG' action with the 'big' array.
+    dispatch({
+      type: ACTION_TYPES.SELECT_ALL_BIG,
+      payload: reducerSelectionsArray(big, startingPoint, endingPoint),
+    });
+  } else if (label === "Even") {
+    // Dispatch the 'SELECT_ALL_EVEN' action with the 'even' array.
+    dispatch({
+      type: ACTION_TYPES.SELECT_ALL_EVEN,
+      payload: reducerSelectionsArray(even, startingPoint, endingPoint),
+    });
+  } else if (label === "Odd") {
+    // Dispatch the 'SELECT_ALL_ODD' action with the 'odd' array.
+    dispatch({
+      type: ACTION_TYPES.SELECT_ALL_ODD,
+      payload: reducerSelectionsArray(odd, startingPoint, endingPoint),
+    });
+  }
+};
+
+
+/**
+ * An array of control buttons to select multiple rows in the game board.
+ * 
+ * Each control object has an `id` and a `label` property.
+ * 
+ * - `id`: a unique identifier for the control button.
+ * - `label`: a text label for the control button.
+ * 
+ * The control buttons are used to select all rows, clear all rows, select even or odd rows,
+ * select small or big rows, etc.
+ */
+export const controls = [
+  { id: 1, label: "All" },    // Select all rows
+  { id: 2, label: "Clear" },  // Clear all rows
+  { id: 3, label: "Even" },   // Select even rows
+  { id: 4, label: "Odd" },    // Select odd rows
+  { id: 5, label: "Small" },  // Select small rows
+  { id: 6, label: "Big" },    // Select big rows
+];
+
+/**
+ * Generates all possible combinations of r elements from the given array of type T.
+ * @param array - An array of elements of type T.
+ * @param r - A number specifying the size of combinations to generate.
+ * @returns An array of arrays of size r containing all possible combinations of the elements in the input array.
+ */
+export function generateCombinations<T>(array: T[], r: number): T[][] {
+  const result: T[][] = [];
+
+  // Recursive function to generate combinations
+  function generateCombos(combination: T[], index: number): void {
+    // Base case: when the combination has the desired size, add it to the result array and return
+    if (combination.length === r) {
+      result.push(combination);
+      return;
+    }
+
+    // Base case: when the index is out of bounds, return
+    if (index >= array.length) {
+      return;
+    }
+
+    // Recursive case: create a new combination by adding the current element to the current combination
+    const newCombo = [...combination];
+    newCombo.push(array[index]);
+
+    // Recursive step: generate combinations starting from the new combination and the next index, and also from the current combination and the next index
+    generateCombos(newCombo, index + 1);
+    generateCombos(combination, index + 1);
+  }
+
+  // Start generating combinations from an empty combination and the first index
+  generateCombos([], 0);
+
+  return result;
+}
+
+/**
+ * gets the n combination r of selection
+ * @param {number} n total elements
+ * @param {number} r sample taken at a time
+ * @returns combination of a selection
+ */
+export function getCombination(n: number, r: number) {
+  if (!(r >= 0 && n >= r)) return 0;
+  return factorial(n) / (factorial(r) * factorial(n - r));
+}
+
+/**
+ * the factorial of a number
+ * @param {number} num what is the factorial of 'num'? the 'num' what is supplied to the function
+ * @returns the factorial of a number
+ */
+export function factorial(num: number) {
+  if (num == 0) return 1;
+  if (num < 0) return 0;
+  let result = num;
+  for (let i = num - 1; i > 1; i--) result *= i;
+  return result;
+}
+
+/**
+ * Calculates the number of possible permutations of r items from a set of n distinct items.
+ *
+ * @param n The number of distinct items in the set.
+ * @param r The number of items to be selected.
+ * @returns The number of possible permutations of r items from a set of n distinct items.
+ */
+export function getPermutation(n: number, r: number): number {
+  return factorial(n) / factorial(n - r);
+}
+
+//not in use anymore
+export function allSelections(...rowsAndSamples: any[]): any[] | number {
+  let rows: any[] = [],
+    samples: any[] = [],
+    perms: any[] = [],
+    results: any[] = [];
+  // console.log(...rowsAndSamples);
+  //dividing rows and samples
+  rowsAndSamples.forEach((element) => {
+    Array.isArray(element) ? rows.push(element) : samples.push(element);
+  });
+
+  if (rows.length !== samples.length) return -1;
+
+  //perming rows
+  let comb, val;
+  rows.forEach((element, index) => {
+    comb = generateCombinations(element, samples[index]);
+    for (val of comb) perms.push(val);
+  });
+
+  // getting non-repeating lists
+  let startCheck = getCombination(rows[0].length, samples[0]);
+  let i, j, permsSize;
+  permsSize = perms.length;
+  for (i = 0; i < startCheck; i++) {
+    for (j = startCheck; j < permsSize; j++) {
+      if (
+        everyInArray(perms[j], perms[i]) ||
+        everyInArray(perms[i], perms[j])
+      ) {
+        continue;
+      }
+      results.push([...perms[i], ...perms[j]]);
+    }
+  }
+  return results.length === 0 ? perms : results;
+}
+
+/**
+ * Checks if every element in the first array is included in the second array.
+ *
+ * @param array1 The first array to check.
+ * @param array2 The second array to check.
+ * @returns A boolean indicating whether every element in the first array is included in the second array.
+ */
+export function everyInArray(array1: Array<any>, array2: Array<any>): boolean {
+  return array1.every((element: any) => {
+    return array2.includes(element);
+  });
+}
+
+/**
+ * Formats an array of user selections into a pipe-delimited string.
+ *
+ * @param selections An array of user selections.
+ * @returns A pipe-delimited string of the non-empty selections.
+ */
+export function userSelections(selections: Array<any>): string {
+  return Object.values(selections)
+    .filter((arr) => {
+      // console.log("Hereexxxx ",arr)
+      return arr.length > 0;
+    })
+    .join("|");
+}
+
+/**
+ * Filters an array of selections and removes any empty arrays
+ *
+ * @param {Array} selections - An array of selections
+ * @returns {Array} - The filtered selections array
+ */
+export function filterSelections(selections: Array<any>): Array<any> {
+  // Log the selections array and filter out any empty arrays
+  // console.log(Object.values(selections).filter((arr) => arr.length > 0));
+  const filteredSelections = Object.values(selections).filter(
+    (arr) => arr.length > 0
+  );
+
+  // Log the original selections array
+  // console.log(selections);
+
+  // Return the filtered selections array
+  return filteredSelections;
+}
+
+/**
+ * Filters out empty values from the given selections object.
+ * @param selections - Object containing the selections.
+ * @returns A new object with filtered non-empty values.
+ */
+export function filterEmptyValues(selections: Record<string, any>): Record<string, any> {
+  const result: Record<string, any> = {};
+
+  for (const key in selections) {
+    if (selections.hasOwnProperty(key)) {
+      const value = selections[key];
+      if (Array.isArray(value)) {
+        // Filter out non-string items from the array
+        const filteredArray = value.filter((item) => typeof item !== "string");
+
+        if (filteredArray.length > 0) {
+          result[key] = filteredArray;
+        }
+      }
+    }
+  }
+
+  return result;
+}
+
+
+
+/**
+ * Calculates the total number of possible combinations of selections across two rows, taking into account repeated selections between the rows.
+ * @param {array} row1Selections - An array containing the selections for the first row.
+ * @param {number} row1Sample - An integer representing the number of selections that can be made from the first row.
+ * @param {array} [row2Selections=[]] - An optional array containing the selections for the second row. Defaults to false if not provided.
+ * @param {number} [row2Sample=[]] - An optional integer representing the number of selections that can be made from the second row. Defaults to false if not provided.
+ * @returns {number} - The total number of possible combinations of selections across both rows.
+ */
+export function _combinations_totalBets(...rowsAndSamples: any[]): number {
+  let rows: number[][] = [];
+  let samples: number[] = [];
+
+  // dividing rows and samples
+  rowsAndSamples.forEach((element) => {
+    Array.isArray(element) ? rows.push(element) : samples.push(element);
+  });
+
+  let row1Len: number = rows[0].length; // Get length of row1 Selections
+  if (rows.length == 1) return getCombination(row1Len, samples[0]); // If there is only one row, return number of combinations for that row
+
+  let row2Len: number = rows[1].length; // Get length of row2 Selections
+  let row1Combinations: number = getCombination(row1Len, samples[0]); // Calculate number of combinations for first row
+  let row2Combinations: number = getCombination(row2Len, samples[1]); // Calculate number of combinations for second row
+  let totalCombinations: number = row1Combinations * row2Combinations; // Calculate total number of combinations
+  let repeatedSelections: number = rows[1].filter((element) =>
+    rows[0].includes(element)
+  ).length; // Count the number of repeated selections between the two rows
+  let combinationsWithoutRepeats: number = -1; // placeholder
+
+  if (samples[0] == 1 && samples[1] == 1) {
+    combinationsWithoutRepeats =
+      row2Len * (row1Len - repeatedSelections) +
+      repeatedSelections * (row2Len - 1); // if sample[0] and sample[1] are 1
+  } else if (samples[0] != 1) {
+    // If there is more than one selection in the first row
+    let repeatsToRemove: number =
+      getCombination(row1Len - 1, samples[0] - 1) * repeatedSelections; // Calculate number of combinations with repeated selections to remove
+    combinationsWithoutRepeats = totalCombinations - repeatsToRemove; // Calculate number of combinations without repeats
+  } else if (samples[1] != 1) {
+    // If there is more than one selection in the second row
+    let repeatsToRemove: number =
+      getCombination(row2Len - 1, samples[1] - 1) * repeatedSelections; // Calculate number of combinations with repeated selections to remove
+    combinationsWithoutRepeats = totalCombinations - repeatsToRemove; // Calculate number of combinations without repeats
+  }
+  return combinationsWithoutRepeats;
+}
+
+/**
+ * Truncates a string with an ellipsis after a certain number of characters and replaces commas with spaces and pipes with commas and spaces.
+ *
+ * @param input - The string to be truncated and modified.
+ * @param truncateAfter - The maximum length of the string before it should be truncated. Default value is 19 if not provided.
+ * @returns The truncated and modified string.
+ */
+export function truncateEllipsis(
+  input: string,
+  truncateAfter: number = 20
+): string {
+  if (input?.length > truncateAfter) {
+    // Replace commas with spaces and pipes with commas followed by spaces
+    const modifiedInput = input?.replace(/,/g, " ").replace(/\|/g, ", ");
+
+    // Extract a substring of length `truncateAfter` from the modified input and add an ellipsis to the end
+    return `${modifiedInput.substring(0, truncateAfter)} ...`;
+  } else {
+    // If the input string is not longer than `truncateAfter`, return the original string
+    return input?.replace(/,/g, " ");
+  }
+}
+
+/**
+  * Calculates the yield multiplier for a bet, based on the minimum yield, bonus,
+  * previous payout, and single bet amount.
+  * @param {number} minimumYield - The minimum yield for the bet.
+  * @param {number} bonus - The bonus for the bet.
+  * @param {number} previousPaid - The previous payout for the bet.
+  * @param {number} singleBetAmt - The amount of the single bet.
+  * @returns {number} The yield multiplier for the bet.
+*/
+export function getYieldMultiplier(minimumYield: number, bonus: number, previousPaid: number, singleBetAmt: number): number {
+  let dividend: number = fixArithmetic(minimumYield * previousPaid) + fixArithmetic(100 * previousPaid);
+  let divisor: number = fixArithmetic(100 * bonus) - fixArithmetic(100 * singleBetAmt) - fixArithmetic(minimumYield * singleBetAmt);
+  let multiplier: number = fixArithmetic(dividend / divisor);
+  return Math.ceil(multiplier);
+}
+
+/**
+ * Prevents duplicate class names in the given classList array by replacing items with the same suffix as the provided className.
+ * @param classList - The array of class names to check and update.
+ * @param className - The class name to be checked for duplicates and used for replacement.
+ * @returns The updated classList array without duplicate class names.
+ */
+//not in use
+export function preventDuplicateClassNames(classList: any, className: string): string[] {
+  console.log("classList fun ----------------->", classList, "className", className)
+  // let _classList = classList.split(" ");
+  let _classList = classList;
+
+  // ().split(" ")
+  let g = _classList.map((item: string, index: string | number) => {
+    // Check if the suffix (part after '|') of className matches the suffix of the current item
+    if (className.split("|")[1] === item.split("|")[1]) {
+      // Replace the current item with the new className
+      _classList[index] = _classList[index].replace(item, className);
+    }
+  });
+  console.log("classList done ----------------->", classList)
+
+  // Return the updated classList array
+  return g;
+}
+
+
+/**
+ * Filters the key-value pairs of an object, keeping only the pairs where the values are not empty.
+ * @param selections - The object to filter.
+ * @returns The filtered object containing key-value pairs with non-empty values.
+ */
+export function filterObjectSelections(selections: { [key: string]: any }): { [key: string]: any } {
+  return Object.fromEntries(
+    Object.entries(selections).filter(([_, value]: [string, any]) => value.length !== 0)
+  );
+}
+
+type SelectionsObject = {
+  [key: string]: {
+    [key: string]: any[];
+  };
+};
+
+export function filterSelectionsManyTable(selections: { [key: string]: any }, game_name: any): { [key: string]: any } {
+  // if (!selections) {
+  //   return {};
+  // }
+
+  return selections && Object.fromEntries(
+    Object.entries(selections[game_name]).filter(([_, value]: [string, any]) => value.length !== 0)
+  );
+
+  // return filteredSelections;
+}
+
+
+/**
+ * Converts an array of objects into a formatted string.
+ * @param filteredKeyArr - The array of objects to convert.
+ * @returns The formatted string.
+ */
+function boxUserSelections(filteredKeyArr: { [key: string]: string[] }[]): string {
+
+  const convertedArray: string[] = [];
+
+  for (let item of filteredKeyArr) {
+    for (let [key, value] of Object.entries(item)) {
+      convertedArray.push(`${key}: ${value.join(", ")}`);
+    }
+  }
+
+  const convertedString: string = convertedArray.join(" | ");
+  return convertedString;
+}
+
+/**
+ * Converts the selections object to an array of arrays representing selected buttons for each key.
+ * @param selections - Object containing the selections for each key.
+ * @param buttons - Array of button names.
+ * @returns An array of arrays representing selected buttons for each key.
+ */
+export function studBullSelections(selections: { [key: string]: number[] }, buttons: string[]): string[][] {
+  let likes: string[][] = []; // Array of arrays
+
+  // Iterate over each key in the filtered selections object
+  Object.keys(filterObjectSelections(selections) as any).forEach((arr) => {
+    let innerLikes: string[] = []; // Inner array for each key
+
+    // Iterate over each number in the selections array
+    selections[arr].forEach((number) => {
+      let index = number;
+
+      // Determine the button based on the number range
+      if (index >= 1 && index <= 4) {
+        innerLikes.push(buttons[index - 1]);
+      } else if (index >= 5 && index <= 10) {
+        innerLikes.push(buttons[index - 5]);
+      } else if (index >= 16 && index <= 30) {
+        innerLikes.push(buttons[index - 16]);
+      }
+    });
+
+    likes.push(innerLikes); // Add the inner array to the likes array
+  });
+
+  return likes;
+}
+
+
+/**
+ * Concatenates arrays of strings into a single string with elements joined by spaces and separated by commas.
+ * @param arr - Array of string arrays.
+ * @returns A concatenated string of the joined arrays.
+ */
+export function concatenateArrays(arr: string[][]): string {
+  // Mapping each inner array to a string representation and joining them with spaces
+  const joinedArr = arr.map(innerArr => innerArr.join(' '));
+
+  // Joining the string representations with commas
+  return joinedArr.join(', ');
+}
+
+
+/**
+ * Analyzes the left and right pairs of draw numbers and provides analysis results.
+ *
+ * @param {number[]} drawNumbers - draw numbers.
+ * @returns {string[]} Analysis results, including which is greater (village or idle) and pair checks.
+ */
+export function calculateBaccaratResult(drawNumbers: number[]): string[] {
+  const [leftPair, rightPair] = splitIntoPairs(drawNumbers);
+  let left = sumPair(leftPair);
+  let right = sumPair(rightPair);
+
+  return [
+    checkWhichIsGreater(padNumberWithZeros(left), padNumberWithZeros(right)),
+    ...checkIdlePairOrZhuang(leftPair, rightPair),
+  ];
+}
+
+/**
+ * Sums the elements in an array.
+ *
+ * @param {number[]} pair - The array of numbers to be summed.
+ * @returns {number} The sum of the numbers in the array.
+ */
+export function sumPair(pair: number[]): number {
+  return pair?.reduce((a, b) => a + b, 0);
+}
+
+/**
+ * Pads a number with leading zeros if it is less than 10.
+ *
+ * @param {number} num - The number to be padded.
+ * @returns {string} The padded number as a string.
+ */
+export function padNumberWithZeros(num: number): string {
+  return num < 10 ? num?.toString().padStart(2, "0") : num?.toString();
+}
+
+/**
+ * Compares the units place of two numbers and returns the comparison result.
+ *
+ * @param {string} village - The village number.
+ * @param {string} idle - The idle number.
+ * @returns {string} The comparison result: "village", "idle", or "and".
+ */
+export function checkWhichIsGreater(village: string, idle: string): string {
+  let _village = village?.[1];
+  let _idle = idle?.[1];
+
+  if (_village > _idle) return "Banker Lose";
+  if (_village < _idle) return "Player Lose";
+  return "Draw";
+}
+
+/**
+ * Checks for a Zhuang pair and/or an Idle pair and returns the results.
+ *
+ * @param {number[]} arr - The array representing one pair of draw numbers.
+ * @param {number[]} values - The array representing another pair of draw numbers.
+ * @returns {string[]} An array of results, including "Zhuang" and/or "Idle pair".
+ */
+export function checkIdlePairOrZhuang(arr: number[], values: number[]): string[] {
+  let final: string[] = [];
+
+  if (arr?.[0] === arr?.[1]) {
+    final.push("Banker Pair");
+  }
+
+  if (values?.[0] === values?.[1]) {
+    final.push("Player Pair");
+  }
+
+  return final;
+}
+
+/**
+ * Divides the draw number [1,4,5,6,6] into two pairs ignoring the middle number.
+ *
+ * @param {number[]} drawNumber - The array of draw numbers.
+ * @returns {number[][]} An array containing two pairs of draw numbers.
+ */
+export function splitIntoPairs(drawNumber: number[]): number[][] {
+  let first = drawNumber?.slice(0, 2);
+  let second = drawNumber?.slice(3);
+
+  return [first, second];
+}
+
+
+// export function studBullSelections(selections: { [key: string]: number[] }, buttons: string[]): (string | undefined)[] {
+//   // Object.keys(selections).map((arr) => {
+
+//   // });
+//   // return selections["firstRow"].map((number) => {
+//   //   let index = number;
+//   //   const arr = [""]
+//   //   if (index >= 1 && index <= 3) {
+//   //     return buttons[index-1];
+//   //   }else if (index >= 4 && index <= 10) {      console.log("index------------------------------>", buttons[index-4]);
+//   //     return buttons[index-4];
+//   //   }else if(index >= 16 && index <= 30){       console.log("index------------------------------>", buttons[index-16]);
+//   //     return buttons[index-16];
+//   //   }
+//   //   return undefined;
+//   // });
+//   let likes : any[] = []
+//    Object.keys(selections).map((arr) => {
+//     console.log("arr", arr);
+//     selections[arr].map((number) => {
+//       let index = number;
+//       if (index >= 1 && index <= 4) {
+//         console.log("index------------------------------>", buttons[index - 1]);
+//         return likes.push( buttons[index - 1]);
+//       } else if (index >= 4 && index <= 10) {
+//         console.log("index------------------------------>", buttons[index - 4]);
+//         return likes.push( buttons[index - 4]);
+//       } else if (index >= 16 && index <= 30) {
+//         console.log("index------------------------------>", buttons[index - 16]);
+//         return likes.push(buttons[index - 16]);
+//       } else {
+//         return likes;
+//       }
+//     });
+//   })
+//   console.log("g=============================>", likes)
+//   return likes;
+// }
+// Object.keys(selections).map((arr) => {
+//   console.log("arr", arr);
+//   selections[arr].map((number) => {
+//     let index = number;
+//     if (index >= 1 && index <= 3) {
+//       console.log("index------------------------------>", buttons[index-1]);
+//       return buttons[index-1];
+//     }else if (index >= 4 && index <= 10) {
+//       console.log("index------------------------------>", buttons[index-4]);
+//       return buttons[index-4];
+//     }else if(index >= 16 && index <= 30){
+//       console.log("index------------------------------>", buttons[index-16]);
+//       return buttons[index-16];
+//     }
+//     return undefined;
+//   });
+/**
+ * Converts an array of checkbox values to a string representation of selected games.
+ * @param checkBoxes - Array of checkbox values.
+ * @returns A string representing the selected games.
+ */
+export function pickGamesSelections(checkBoxes: number[]): string {
+  // Array of checkbox labels
+  const checkBoxArr = ["1st", "2nd", "3rd", "4th", "5th"];
+  let c = "";
+
+  // Constructing the string representation of selected games
+  checkBoxes.forEach((item, index) => {
+    c += checkBoxArr[item - 1] + (index < checkBoxes.length - 1 ? " " : "");
+  });
+
+  return c;
+}
+
+// export const renderCheckboxes = (checkBoxArr: any[], checkedBoxes: any[], like: any, addToSelectedPlaces: (arg0: any, arg1: any) => any) => {
+//   const checkboxes = [...like];
+//   checkBoxArr.forEach((checkBox, i) => {
+//     const isChecked = checkedBoxes.includes(i + 1);
+//     checkboxes.push(
+//       <label key={${i}}>
+//         <input
+//           type="checkBox"
+//           checked={${isChecked}}
+//           onChange={${(e: any) => addToSelectedPlaces(e, i)}}
+//         />
+//         {${checkBox}}
+//       </label>
+//     );
+//   });
+//   return checkboxes;
+// };
+
+export function filterDragonTieThreeCardsSelections(selections: { [key: string]: any }) {
+  let filteredKeyArr = Object.keys(selections).map((arr) => {
+    let a = selections[arr].filter((item: any) => {
+      // console.log("item==========================>", item)
+      return typeof item === "string"
+    });
+    // console.log("a", [arr])
+
+    return {
+      [arr]: a,
+    };
+  });
+
+  return boxUserSelections(filteredKeyArr);//JSON.stringify(filteredKeyArr)
+}
+
+/**
+ * Truncates decimal. chops without rounding
+ * @param {number} number data to truncate
+ * @param {number} decimalPlaces number of decimal places to truncate
+ * @returns truncated number
+//  */
+// export function truncate(number: number, decimalPlaces: number = 3): number {
+//   let indexOfDecimal = number?.toString().indexOf(".");
+//   if (indexOfDecimal == -1) return number;
+//   let result = number?.toString().slice(0, indexOfDecimal + (decimalPlaces + 1));
+//   return parseFloat(result).toFixed(decimalPlaces).toString();
+// }
+export function truncate(number) {
+  // Convert the number to a string
+  const numStr = number.toString();
+
+  // Split the number into whole and decimal parts
+  const parts = numStr.split('.');
+
+  // If there's no decimal part, add '.000'
+  if (parts.length === 1) {
+      return numStr + '.000';
+  }
+
+  // If the decimal part is less than 3 digits, add the necessary number of zeros
+  if (parts[1].length < 3) {
+      return numStr + '0'.repeat(3 - parts[1].length);
+  }
+
+  // If the decimal part is more than 3 digits, truncate it to 3 digits without rounding
+  return parts[0] + '.' + parts[1].substr(0, 3);
+}
+
+// export function truncate(number: number, decimalPlaces: number = 3): number {
+//   if (number === undefined || number === null) {
+//     return NaN; // or some default value based on your requirement
+//   }
+
+//   // Convert the number to a string
+//   const numberString = number.toString();
+
+//   // Find the position of the decimal point
+//   const indexOfDecimal = numberString.indexOf(".");
+
+//   if (indexOfDecimal === -1) {
+//     // If there is no decimal point, return the original number
+//     return number;
+//   }
+
+//   // Calculate the end position to keep exactly `decimalPlaces` digits after the decimal point
+//   const endIndex = indexOfDecimal + decimalPlaces + 1;
+
+//   // Extract the desired portion of the string
+//   const resultString = numberString.slice(0, endIndex);
+
+//   // Parse the result back to a floating-point number
+//   return parseFloat(resultString);
+// }
+
+/**
+  * filters non-integer characters from data provided.
+  * @param {number} value the value to be filtered
+  * @param {number} minValue minimum acceptable integer value
+  * @param {number} maxValue maximum acceptable integer value
+  * @returns only numbers from passed data.the number returned exists between a range provided by 'minValue' and 'maxValue'
+  */
+export function onlyNum(value: string, minValue: number = 1, maxValue: number = 99999) {
+  let onlyNums = parseInt(value.replace(/\D+/g, ""));
+  if (value) {
+    onlyNums = onlyNums || minValue;
+    onlyNums = onlyNums >= maxValue ? maxValue : onlyNums;
+  }
+  return onlyNums;
+}
+
+/**
+ * Checks if a value is empty.
+ * @param value - The value to check.
+ * @returns A boolean indicating whether the value is empty or equal to zero.
+ */
+export function isEmpty(value: any): boolean {
+  if (value === null || value === undefined || value === 0) {
+    return true;
+  }
+
+  if (typeof value === 'string' && value.trim() === '') {
+    return true;
+  }
+
+  if (Array.isArray(value) && value.length === 0) {
+    return true;
+  }
+
+  if (typeof value === 'object' && Object.keys(value).length === 0) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Sets the Quat value and performs related calculations.
+ * @param val - The Quat value to set.
+ * @param setUnit - Function to set the unit value.
+ * @param setQuatar - Function to set the Quatar value.
+ * @param setMultiplier - Function to set the multiplier value.
+ * @param setBetAmount - Function to set the bet amount value.
+ * @param toast - Object with an `error` method for displaying error messages.
+ * @param totalBetsCalc - The total bets calculation value.
+ * @param balance - The balance value.
+ */
+export const setQuat = (
+  val: any,
+  setUnit: (arg0: number) => void,
+  setQuatar: (arg0: any) => void,
+  setMultiplier: (arg0: number) => void,
+  setBetAmount: (arg0: any) => void,
+  toast: { error: (arg0: string) => void },
+  totalBetsCalc: number,
+  balance: number
+) => {
+  if (totalBetsCalc === 0) {
+    toast.error("Kindly make selections"); // Display an error message if no selections are made
+  } else {
+    setQuatar(val); // Set the Quatar value
+    setMultiplier(1); // Set the multiplier value to 1
+    let pseudoAmount = fixArithmetic(val * balance); // Calculate the pseudo amount
+    let truncatedPseudoAmount = +truncate(pseudoAmount); // Truncate the pseudo amount
+    let truUnit = truncatedPseudoAmount / totalBetsCalc; // Calculate the true unit
+    let finalUnit = +truncate(truUnit); // Truncate the true unit
+    setUnit(finalUnit); // Set the unit value
+    setBetAmount(""); // Clear the bet amount value
+  }
+};
+
+
+/**
+ * Processes the result array and returns a transposed array.
+ * @param result - The result array to be processed.
+ * @returns A transposed array.
+ */
+export function manualProcessResult(result: any): any[] {
+  return result[0]
+    .map((_: any, index: number) =>
+      result
+        .filter((row: any) => row.length > 0)
+        .map((row: any) => row[index])
+    );
+}
+
+/**
+ * Processes the result array and returns a formatted string representing user selections.
+ * @param result - The result array to be processed.
+ * @returns A formatted string representing user selections.
+ */
+export function manualProcessorUserSelections(result: any): string {
+  return result[0]
+    .map((_: any, index: number) =>
+      result
+        .filter((row: any) => row.length > 0)
+        .map((row: any) => row[index])
+        .join(",")
+        .split(",")
+    )
+    .join(" | ");
+}
+
+// export function generateBetObjects(dataArray, drawData) {
+//   const betObjects = [];
+
+//   dataArray.forEach(item => {
+//       const { userSelection, game_id, game_name, amount } = item;
+
+//       const betObject = {
+//           allSelections: [userSelection],
+//           betId: drawData.nextBetId,
+//           bet_date: getDate("" + new Date()),
+//           bet_time: getTimeTwo(new Date()),
+//           gameId: game_id,
+//           game_label: game_name,
+//           lottery_id: 1,
+//           multiplier: 1,
+//           totalBetAmt: amount,
+//           totalBets: 1,
+//           uid: 1,
+//           unitStaked: 1,
+//           userSelections: `${game_name}: ${userSelection}`
+//       };
+//       betObjects.push(betObject);
+//     //  betObjects[userSelection + game_id] = betObject;
+
+//   });
+
+//   return betObjects;
+// }
+
+/**
+ * Generates an array of formatted bet objects.
+ * @param dataArray - An array of input data objects.
+ * @param drawData - An object containing draw-related data.
+ * @returns An array of formatted bet objects.
+ */
+export function generateBetObjectsLongDragon(dataArray: {
+  userSelection: string;
+  game_id: number;
+  game_name: string;
+  amount: number;
+}[], drawData: {
+  nextBetId: number;
+}): {
+  allSelections: string[];
+  betId: number;
+  bet_date: string;
+  bet_time: string;
+  gameId: number;
+  game_label: string;
+  lottery_id: number;
+  multiplier: number;
+  totalBetAmt: number;
+  totalBets: number;
+  uid: number;
+  unitStaked: number;
+  userSelections: string;
+}[] {
+  const betObjects: {
+    allSelections: string[];
+    betId: number;
+    bet_date: string;
+    bet_time: string;
+    gameId: number;
+    game_label: string;
+    lottery_id: number;
+    multiplier: number;
+    totalBetAmt: number;
+    totalBets: number;
+    uid: number;
+    unitStaked: number;
+    userSelections: string;
+  }[] = [];
+
+  dataArray.forEach(item => {
+    const { userSelection, game_id, game_name, amount } = item;
+
+    const betObject = {
+      allSelections: [userSelection],
+      betId: drawData.nextBetId,
+      bet_date: getDate("" + new Date()),
+      bet_time: getTimeTwo(new Date()),
+      gameId: game_id,
+      game_label: game_name,
+      lottery_id: 1,
+      multiplier: 1,
+      totalBetAmt: amount,
+      totalBets: 1,
+      uid: 1,
+      unitStaked: 1,
+      userSelections: `${game_name}: ${userSelection}`,
+    };
+
+    betObjects.push(betObject);
+  });
+
+  return betObjects;
+}
+
+
+/**
+ * Process the bet information.
+ * @param main_name - The main name object containing the bet information.
+ * @returns An array of processed results.
+ */
+export function processBetInfo(main_name: Record<string, any>, drawData: { nextBetId: any; }, lottery_id: any, multiplier: number): Array<Record<string, any>> {
+  let results: Array<Record<string, any>> = [];
+
+  for (let game_label in main_name) {
+    let g_name = main_name[game_label];
+
+    for (let position in g_name) {
+      let selection = g_name[position];
+
+      for (let sel in selection) {
+        let result: Record<string, any> = {};
+
+        if (Array.isArray(selection[sel])) {
+          let f = {
+            /**
+             * Object representing all selections.
+             * @property position - The position.
+             * @property selection - The selection.
+             * @property label_id - The label ID.
+             */
+            allSelections: { position: position, selection: selection[sel][0], label_id: selection[sel][2] },
+            betId: drawData.nextBetId,
+            bet_date: getDate("" + new Date()),
+            bet_time: getTimeTwo(new Date()),
+            gameId: selection[sel][3],//fetch from api
+            game_label: game_label,
+            lottery_id: lottery_id,
+            multiplier: multiplier,
+            totalBetAmt: Number(selection[sel][1]),
+            totalBets: 1,
+            uid: results.length + 1,
+            unitStaked: 1,
+            userSelections: `${sel} ${position} ${selection[sel][0]}`
+          };
+          result = { ...result, ...f };
+        }
+
+        if (!Array.isArray(selection[sel])) {
+          for (let key in selection[sel]) {
+            let f = {
+              /**
+               * Object representing all selections.
+               * @property position - The position.
+               * @property selection - The selection.
+               * @property label_id - The label ID.
+               */
+              allSelections: { position: position, selection: key, label_id: Object.keys(Object.values(selection[sel][key])[0] as any)[0] },
+              betId: drawData.nextBetId,
+              bet_date: getDate("" + new Date()),
+              bet_time: getTimeTwo(new Date()),
+              gameId: Object.values(Object.values(selection[sel][key])[0] as any)[0],//fetch from api
+              game_label: game_label,
+              lottery_id: 1,
+              multiplier: multiplier,
+              totalBetAmt: +Object.keys(selection[sel][key])[0],
+              totalBets: 1,
+              uid: results.length + 1,
+              unitStaked: 1,
+              userSelections: `${sel} ${position} ${key}`
+            };
+            result = { ...result, ...f };
+            results.push(result); // Move the push inside the loop
+          }
+        } else {
+          results.push(result); // Move the push inside the loop
+        }
+      }
+    }
+  }
+
+  return results;
+}
+
+
+/**
+ * Processes road bet selections and converts them to a structured array to submit as bet.
+ *
+ * @param roadBetSelections - The road bet selections to process.
+ * @returns An array of processed bet selections.
+ */
+export function processRoadBetSelections(roadBetSelections: Record<string, Record<string, Record<string, string | number>>>, nextBetId: string, lotteryId: any, multiplier: number): Array<Record<string, any>> {
+  const results: Array<Record<string, any>> = [];
+  const groupType: any = {
+    "Big": "Big/Small",
+    "Small": "Big/Small",
+    "Odd": "Odd/Even",
+    "Even": "Odd/Even",
+    "Prime": "Prime/Composite",
+    "Composite": "Prime/Composite",
+    "Dragon": "Dragon/Tiger",
+    "Tiger": "Dragon/Tiger",
+    "Tie": "Dragon/Tiger",
+  }
+  for (const place in roadBetSelections) {
+    const selectedGamePlaces = roadBetSelections[place];
+
+    for (const gn_id in selectedGamePlaces) {
+      const userSelections = selectedGamePlaces[gn_id];
+
+      for (const userSelection in userSelections) {
+        const betAmount = userSelections[userSelection];
+        const gameLabel = `${place} ${groupType[userSelection]}`;
+
+
+        results.push({
+          betId: nextBetId,
+          allSelections: [userSelection],
+          totalBetAmt: Number(betAmount),
+          uid: results.length + 1,
+          bet_date: getDate("" + new Date()),
+          bet_time: getTimeTwo(new Date()),
+          game_label: gameLabel,
+          totalBets: 1,
+          lottery_id: lotteryId,
+          unitStaked: 1,
+          multiplier,
+          gameId: Number(gn_id),
+          userSelections: `${gameLabel} ${userSelection}`,
+        });
+      }
+    }
+  }
+
+  return results;
+};
+
+
+
+/**
+ * Handles the change event of an input field.
+ *
+ * @param {Event} e - The event object.
+ * @param {object} bet_items - The bet items object.
+ * @param {string} bet_title - The title string.
+ * @param {string} game_name - The game name string.
+ * @param {string} action_type - The action type string for dispatch.
+ * @returns {void}
+ */
+export const handleChange = (
+  e: ChangeEvent<HTMLInputElement>,
+  bet_items: any,
+  bet_title: string,
+  game_name: string,
+  action_type: string,
+  two_sides_dispatch: any,
+  setInputValues: any,
+): void => {
+  const { value } = e.target as HTMLInputElement;
+
+  // Remove non-digit characters from the value
+  let parsedValue = value.replace(/\D+/g, "");
+
+  // Check if the parsed value is empty
+  if (isEmpty(parsedValue)) {
+    parsedValue = "";
+  }
+
+  // Check if the parsed value is a valid number
+  const isValidNumber = !isNaN(+parsedValue);
+
+  // Limit the value to be less than or equal to 99999
+  const limitedValue = +parsedValue > 99999 ? 99999 : parsedValue;
+
+  console.log("==========================>isValidNumber", `${isNaN(bet_items?.label) ? bet_items?.label : `_${bet_items?.label}`}`);
+  console.log("==========================>isValidNumber", `${isNaN(bet_items?.label) ? bet_items?.label : `_${bet_items?.label}`}-${removeWhiteSpaces(bet_items?.key)
+    }${bet_title}`);
+  setInputValues((prevValues: any) => ({
+    ...prevValues,
+    [`${isNaN(bet_items?.label) ? removeWhiteSpaces(bet_items?.label) : `_${removeWhiteSpaces(bet_items?.label)}`}-${removeWhiteSpaces(bet_items?.key)
+      }${bet_title}`]: limitedValue,
+  }));
+  // rowId: item.key,
+  // userSelection: item.label,
+  // position: name,
+  // game_name: name,
+  // amount: amt,
+  // label_id: item.labelid
+  two_sides_dispatch({
+    type: action_type,
+    payload: {
+      rowId: bet_items?.key,
+      userSelection: bet_items?.label,
+      position: bet_title,
+      game_name: game_name,
+      amount: isValidNumber ? limitedValue : 99999,
+      label_id: "" + bet_items.labelid,
+      game_id: "" + bet_items.gameid
+    },
+  });
+
+};
+
+export function deepCopy(obj: any) {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+
+  const copy: any = Array.isArray(obj) ? [] : {};
+
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      copy[key] = deepCopy(obj[key]);
+    }
+  }
+
+  return copy;
+}
+
+export const handleMultiplierClick = (multiplier: any, states: any): void => {
+  states?.setMultiplier(multiplier);
+
+  states?.setInputValues((prevValues: any) => {
+    const updatedValues = { ...prevValues };
+    Object.keys(updatedValues).forEach((key) => {
+      updatedValues[key] = multiplier;
+    });
+    return updatedValues;
+  });
+};
+
+
+
+/**
+ * Remove white spaces from a string.
+ * @param str - The input string.
+ * @returns The string with white spaces removed.
+ */
+export function removeWhiteSpaces(str: string): string {
+  return str?.toString().replace(/\s/g, '');
+}
+
+/**
+ * Handles the input values based on the provided parameters.
+ *
+ * @param {string} items - The items string.
+ * @param {object} item - The item object.
+ * @param {number} multiplier - The multiplier value.
+ * @param {string} type - The type string.
+ * @param {boolean} isObject - The object flag.
+ * @param {string} game_name - The game name string.
+ * @returns {string | null | {}} - The result based on the type.
+ */
+export function handleInputValues(
+  items: string,
+  item: any,
+  multiplier: number,
+  type: string,
+  isObject: boolean,
+  game_name: string,
+  two_sides_selections: any,
+  inputValues: any
+): string | null | {} {
+  const a = two_sides_selections?.[game_name]?.[items]?.[item?.key];
+  // console.log("guyssssssssssssssssssssssss========================>", object)
+
+  const condition = isObject
+    ? a?.hasOwnProperty(item?.label)
+    : a?.includes(item?.label);
+  // ${isNaN(item.label) ? item.label : `_${removeWhiteSpaces(item.label)}`}-${removeWhiteSpaces(item.key)}${removeWhiteSpaces(data.names[3])} kills`
+  if (type === "setInputValues") {
+    const inputKey = isNaN(item?.label) ? removeWhiteSpaces(item?.label) : `_${removeWhiteSpaces(item?.label)}`;
+    const inputValue = condition ? "" : multiplier;
+    // console.log("guyssssssssssssssssssssssss========================>",`${inputKey}-${item?.key}${items}`)
+    // console.log("guyssssssssssssssssssssssss========================>",inputValues[`${inputKey}-${item?.key}${items}`])
+    inputValues[`${inputKey}-${removeWhiteSpaces(item?.key)}${items}`] = inputValue;
+  } else if (type === "emptyString") {
+    console.log("===============================emptyString", isObject);
+    console.log("===============================emptyString", condition);
+    return condition ? "" : multiplier;
+  } else if (type === "color") {
+    // console.log("guyssssssssssssssssssssssss========================>", condition)
+
+    return condition ? "#ffe8da" : null;
+  }
+
+  console.log("jigjgjgjgjgjgjjg", inputValues);
+  return inputValues;
+}
+
+/**
+ * Calculates the total count of orders in the provided state.
+ *
+ * @param {object} state - The state object.
+ * @returns {number} - The total count of orders.
+ */
+export function getOrderCount(state: object): number {
+  let count = 0;
+
+  // Iterate over the game names
+  Object.values(state).forEach((game) => {
+    // Iterate over the game IDs
+    Object.values(game).forEach((gameObj: any) => {
+      // Iterate over the row IDs
+      Object.values(gameObj).forEach((rowObj: any) => {
+        // Increment the count by the number of keys in the row object
+        Object.keys(rowObj).forEach((key) => {
+          if (typeof rowObj[key] === "number" || typeof rowObj[key] === "object") {
+            count += 1;
+          }
+
+          // console.log("this is the amount", rowObj[key])
+          // console.log("this is the amount",Object.keys(amount)[0])
+        });
+      });
+    });
+  });
+
+  return count;
+}
+
+/**
+ * Calculates the sum of amounts in the provided state.
+ *
+ * @param {object} state - The state object.
+ * @returns {number} - The sum of amounts.
+ */
+export function getAmountSum(state: object): number {
+  let sum = 0;
+
+  // Iterate over the game names
+  Object.values(state).forEach((game) => {
+    // Iterate over the game IDs
+    Object.values(game).forEach((gameObj: any) => {
+      // Iterate over the row IDs
+      Object.values(gameObj).forEach((rowObj: any) => {
+        // Iterate over the keys in the row object
+        Object.values(rowObj).forEach((amount: any, index) => {
+          if (typeof amount === "number") {
+            sum += +amount;
+          } else {
+
+            sum += +Object.keys(amount)[0]
+          }
+
+        });
+      });
+    });
+  });
+
+  return sum;
+}
+
+
+export function sumRoadBetSelectionsAmount(roadBetSelections: any) {
+  let sum = 0;
+
+  for (const key in roadBetSelections) {
+    if (typeof roadBetSelections[key] === 'object') {
+      sum += sumRoadBetSelectionsAmount(roadBetSelections[key]);
+    } else if (typeof roadBetSelections[key] === 'number') {
+      sum += roadBetSelections[key];
+    }
+  }
+
+  return sum;
+}
+
+
+/**
+ * Handles setting the bet amount and performs related calculations.
+ * @param e - The event object.
+ * @param setUnit - Function to set the unit value.
+ * @param setBetAmount - Function to set the bet amount value.
+ * @param totalBetsCalc - The total bets calculation value.
+ * @param toast - Object with an `error` method for displaying error messages.
+ */
+export const onAmountBetset = (
+  e: any,
+  setUnit: (arg0: number) => void,
+  setBetAmount: (arg0: any) => void,
+  totalBetsCalc: number,
+  toast: { error: (arg0: string) => void },
+  setMultiplier: (arg0: number) => void,
+  unitAmt: number
+) => {
+  let input = e.target.value;
+  console.log(typeof input)
+  // console.log(input.replace(/\D+/g, ""))
+  if (input.replace(/\D+/g, "") !== "") {
+    if (totalBetsCalc === 0) {
+      toast.error("Kindly make selections"); // Display an error message if no selections are made
+    } else {
+      let amount = onlyNum(input);
+      setBetAmount(amount); // Set the bet amount value
+      // amount ? setBetAmount(amount) : setBetAmount(fixArithmetic(totalBetsCalc * multiplier * unitAmt)); // Set the bet amount value
+      let res = calcUnitAmt(amount, totalBetsCalc)//+truncate(amount / totalBetsCalc); // Calculate the unit value
+      // console.log("res-------------------------------------->", res)
+      setUnit(res); // Set the unit value
+      let pseudoUnit = calcPseudoUnit(amount, totalBetsCalc);
+      let multiplier = fixArithmetic(pseudoUnit / res);
+      multiplier === 0 || isNaN(multiplier) ? null : setMultiplier(multiplier)
+      // setUnit(res); // (Assuming this is intended to be repeated) Set the unit value again
+    }
+  } else {
+    setBetAmount("")
+  }
+  // if(typeof input === "number" && !isNaN(input)){
+
+  //   if (totalBetsCalc === 0) {
+  //     toast.error("Kindly make selections"); // Display an error message if no selections are made
+  //   } else {
+  //     let amount = onlyNum(input.toString());
+  //     setBetAmount(amount); // Set the bet amount value
+  //     // amount ? setBetAmount(amount) : setBetAmount(fixArithmetic(totalBetsCalc * multiplier * unitAmt)); // Set the bet amount value
+  //     let res = calcUnitAmt(amount, totalBetsCalc)//+truncate(amount / totalBetsCalc); // Calculate the unit value
+  //     // console.log("res-------------------------------------->", res)
+  //     setUnit(res); // Set the unit value
+  //     let pseudoUnit = calcPseudoUnit(amount, totalBetsCalc);
+  //     let multiplier = fixArithmetic(pseudoUnit / res);
+  //     multiplier === 0 || isNaN(multiplier) ? null : setMultiplier(multiplier)
+  //     // setUnit(res); // (Assuming this is intended to be repeated) Set the unit value again
+  //   }
+  // }
+};
+
+/**
+ * when bet amount is divided by total bets, the resulting value is what I call 'pseudoUnit'.
+ * unit amount is always selected from the default unit list ie  2, 1, 0.2, 0.1, 0.02, 0.01, 0.002 and 0.001
+ * 'pseudoUnit' however sometimes gives a different value from the default unit list. 'pseudoUnit' is therefore used to calculate a unit
+ * amount to give give a unit amount in the default list. This manipulation is done by increasing the multiplier.
+ *
+ *
+ * @returns a unit amount influenced by a multiplier of 1.
+ */
+function calcPseudoUnit(betAmt: number, totalBets: number) {
+  return truncate(betAmt / totalBets);
+}
+
+/**
+  * counts the number of decimal places of  a number
+  * @param {number} value number supplied
+  * @returns total decimal places
+  */
+function decimalCount(value: number) {
+  const strValue = String(value);
+  return strValue.includes(".") ? strValue.split(".")[1].length : 0;
+}
+
+/**
+ * Algorithm that returns a unit amount from the defined list 2, 1, 0.2, 0.1, 0.02, 0.01, 0.002 or 0.001 no matter number of bets selected.
+ * @returns a unit amount in the list 2, 1, 0.2, 0.1, 0.02, 0.01, 0.002 or 0.001
+ */
+export function calcUnitAmt(betAmt: number, totalBets: number) {
+  /**New Implementation */
+  let pseudoUnit = calcPseudoUnit(betAmt, totalBets);
+  let decimalCounts = decimalCount(pseudoUnit);
+  let pseudoMult = fixArithmetic(pseudoUnit * 10 ** decimalCounts);
+  let realUnit =
+    pseudoMult % 2 == 0 ? 2 * 10 ** -decimalCounts : 10 ** -decimalCounts;
+  return realUnit;
+}
+
+/**
+ * Calculates the default user's prize based on game odds and unit amount.
+ * @param gameOdds - The game odds as a string or number.
+ * @param unit - The unit amount.
+ * @returns The calculated user's prize truncated to four decimal places.
+ */
+export function defaultUserPrize(gameOdds: string | number, unit: number): number {
+  // Calculate the user's prize using the default rebate value (85%).
+  const prize = (((85 + 15) / 100) * +gameOdds) * unit;
+  // let p = truncate(prize, 4)
+  // setUserPrize(p)
+  // Truncate the prize to four decimal places.
+  return truncate(prize, 4);
+}
+
+
+
+// export function togglePrize(prize: number): void {
+//   const prizeIndex: number = selectedPrizes.indexOf(prize);
+
+//   if (prizeIndex === -1) {
+//     selectedPrizes.push(prize);
+//   } else {
+//     selectedPrizes.splice(prizeIndex, 1);
+//   }
+
+//   // updatePrizeDisplay();
+// }
+
+/**
+ * Calculates the actual profit for a bet particularly standard model.
+ * 
+ * @param gameType_id - The game type ID. 
+ * @param userPrize - The prize amount the user won.
+ * @param totalBetsAmt - The total amount the user bet. 
+ * @param multiplier - The betting multiplier for non-multiple selection games.
+ * @param selections - The selections the user made in the bet.
+ * @returns The calculated actual profit.
+ */
+export function actualProfitBet(
+  gameId: number, 
+  userPrize: any, 
+  totalBetsAmt: number,
+  multiplier: number,
+  selections: any
+): number {
+
+  if (gameId === 99) {
+    // Multiple selection game
+    return fixArithmetic(
+      (userPrize * filterSelections(selections).length) - totalBetsAmt
+    );
+
+  } else {
+    // Non-multiple selection game
+    return fixArithmetic(
+      (multiplier * (isNaN(userPrize) ? Math.max(...userPrize.split("~")) : userPrize)) - 
+      totalBetsAmt
+    );
+  }
+}
+/**
+* Calculates the actual profit for a bet with multiple selections particularly many tables.
+* 
+* @param userPrize - The prize amount the user won. 
+* @param totalBetsAmt - The total amount the user bet.
+* @param selections - The selections the user made in the bet.
+* @returns The actual profit after subtracting the total bet amount from the prize.
+*/
+export function actualProfitBetNew(userPrize: number, totalBetsAmt: number, selections: any): number {
+
+  // Calculate the total number of selections
+  let totalSelections = getTotalManyTablesSelections(selections);
+
+  // Object.values(selections).forEach((select: any) => {
+  //   totalSelections += filterSelections(select).length;
+  // });
+  // Calculate and return the actual profit
+  return fixArithmetic(((userPrize) * totalSelections) - totalBetsAmt);
+
+}
+
+function getTotalManyTablesSelections(selections){
+  let totalSelections = 0;
+  Object.values(selections).forEach((select: any) => {
+    totalSelections += filterSelections(select).length;
+  });
+  return totalSelections;
+}
+
+function getNonEmptyKeyCount(selections: any): number {
+
+  let count = 0;
+
+  Object.keys(selections).forEach(key => {
+    const rows = selections[key];
+
+    if (rows.firstRow.length > 0 ||
+      rows.secondRow.length > 0 ||
+      rows.thirdRow.length > 0 ||
+      rows.fourthRow.length > 0 ||
+      rows.fifthRow.length > 0) {
+      count++;
+    }
+  });
+
+  return count;
+
+}
+
+export let selectedPrizes: any[] = [];
+
+export function resetSelectedPrizes() {
+  selectedPrizes = [];
+}
+
+export function updatePrizeDisplay(gameOdds: string | number, unit: number, rebate:  number, selection: any, item: any, small: any, big: any): any {
+
+  const prizeIndex: number = selectedPrizes.indexOf(gameOdds + "+" + selection + item);
+  console.log("small big", selectedPrizes)
+
+  if (prizeIndex === -1) {
+    selectedPrizes.push(gameOdds + "+" + selection + item);
+  } else {
+    selectedPrizes.splice(prizeIndex, 1);
+  }
+
+  let prizeRange: string = "";
+  let a = [...new Set(selectedPrizes.map((item) => item.split("+")[0]))]
+  console.log("a---------------------------------->", a)
+  if (a.length === 1) {
+    prizeRange = `${calculatedUserPrize(a[0], unit, rebate)}`;
+  } else if (a.length > 1) {
+    const minPrize: number = Math.min(...a);
+    const maxPrize: number = Math.max(...a);
+    prizeRange = `${calculatedUserPrize(minPrize, unit, rebate)} ~ ${calculatedUserPrize(maxPrize, unit, rebate)}`;
+  }
+
+  // Display the prize range or update your UI accordingly
+  console.log("prizeRange============>" + prizeRange);
+  // console.log("selectedPrizes============>" + selectedPrizes);
+  return a.length === 0 ? `${calculatedUserPrize(small, unit, rebate)} ~ ${calculatedUserPrize(big, unit, rebate)}` : prizeRange;
+}
+
+
+export function TwoSidesBetNow(data: any) {
+  let gameNames: any[] = [];
+  const combineGameNamesAndType = [];
+  let combineGameTypeAndUserSelection = [];
+
+  Object.keys(data).forEach((item: any) => {
+    gameNames.push(item);
+  });
+
+  for (const element of gameNames) {
+    let game_name = element;
+    let game_type = Object.keys(data[element]);
+    combineGameNamesAndType.push([game_name, game_type]);
+  }
+  // console.log(combineGameNamesAndType);
+  for (const element of combineGameNamesAndType) {
+    let game_name = element[0];
+    let game_type = element[1];
+    for (const element of game_type) {
+      combineGameTypeAndUserSelection.push(data[game_name][element]);
+      // console.log(game_type[j])
+    }
+  }
+
+  const basket = combineGameTypeAndUserSelection.map((item) =>
+    Object.entries(item).flatMap(([key, values]) => [[key, values]])
+  );
+
+  // spreaking basket items into one array
+  const resultFlat = basket.flat();
+
+  //filtering all arrays from the basket
+  const filteredArrayResult = resultFlat.filter((item) => Array.isArray(item[1]));
+
+  //filtering all objects from the basket
+  const filteredAObjectResult = resultFlat.filter(
+    (item) => !Array.isArray(item[1])
+  );
+
+  // converting all objects to array
+  const flatFilteredObjectResult = filteredAObjectResult.map((arr: any) =>
+    Object.entries(arr[1]).map(([key, value]) => [arr[0], [Number(key), value]])
+  );
+
+  const finalFlatArrayMap = filteredArrayResult.map((arr) => arr.flat());
+  const finalFlatObjectMap = flatFilteredObjectResult
+    .flat()
+    .map((arr) => arr.flat());
+
+  const combineArrays = [finalFlatArrayMap, finalFlatObjectMap].flat();
+
+  const finalDataToBeSent = combineArrays.map(([gameName, userSelections, amount]) => ({
+    betId: "5654546",
+    game_id: 3,
+    game_name: gameName,
+    amount,
+    userSelections,
+    allSelections: userSelections,
+  }));
+
+  return finalDataToBeSent
+}
+
+
+
+
+
+
+// let selectedPrizes: { [key: string]: number } = {};
+
+// export function updatePrizeDisplay(gameOdds: string | number, unit: number, rebate: { rebate: number }, selection: any, item:any): any {
+//   const oddsKey = selection;
+
+//   if (!(oddsKey in selectedPrizes)) {
+//     selectedPrizes[oddsKey] = {gameOdds, item};
+//   } else {
+//     // delete selectedPrizes[oddsKey];
+//   }
+
+//   const prizeValues = Object.values(selectedPrizes);
+
+//   let prizeRange: string = "";
+
+//   if (prizeValues.length === 1) {
+//     prizeRange = `${calculatedUserPrize(prizeValues[0], unit, userData)}`;
+//   } else if (prizeValues.length > 1) {
+//     const minPrize: number = Math.min(...prizeValues);
+//     const maxPrize: number = Math.max(...prizeValues);
+//     prizeRange = `${calculatedUserPrize(minPrize, unit, userData)} ~ ${calculatedUserPrize(maxPrize, unit, userData)}`;
+//   }
+
+//   console.log("prizeRange============>" + prizeRange);
+//   console.log(selectedPrizes);
+//   console.log(item);
+//   // return selection(prizeRange);
+//   return prizeRange;
+// }
+
+/**
+ * Calculates the user's prize based on game odds, unit amount, and user data.
+ * @param gameOdds - The game odds as a string or number.
+ * @param unit - The unit amount.
+ * @param userData - The user's data containing the rebate value.
+ * @returns The calculated user's prize truncated to four decimal places.
+ */
+export function calculatedUserPrize(gameOdds: string | number, unit: number,rebate: number ): number {
+  // Calculate the user's prize using the rebate value from user data.
+  const prize = (((85 + Number(rebate)) / 100) * Number(gameOdds)) * Number(unit);
+  // Truncate the prize to four decimal places.
+  return truncate(prize, 4);
+}
+
+//  function _combinations_totalBets(...rowsAndSamples: any[]): number {
+//     let rows:any = [], samples:any = [];
+//     //dividing rows and samples
+//     rowsAndSamples.forEach((element:number) => {
+//       Array.isArray(element) ? rows.push(element) : samples.push(element);
+//     });
+// // console.log(rows, samples)
+//     let row1Len = rows[0]?.length; // Get length of row1 Selections
+//     if (rows.length == 1) return getCombination(row1Len, samples[0]); // If there is only one row, return number of combinations for that row
+//     let row2Len = rows[1]?.length; // Get length of row2 Selections
+//     let row1Combinations = getCombination(row1Len, samples[0]); // Calculate number of combinations for first row
+//     let row2Combinations = getCombination(row2Len, samples[1]); // Calculate number of combinations for second row
+//     let totalCombinations = row1Combinations * row2Combinations; // Calculate total number of combinations
+//     let repeatedSelections = rows[1]?.filter((element:any) => rows[0].includes(element)).length; // Count the number of repeated selections between the two rows
+//     let combinationsWithoutRepeats = -1; // Placeholder for variable to be calculated
+//     if (samples[0] != 1) { // If there is more than one selection in the first row
+//       let repeatsToRemove = getCombination(row1Len - 1, samples[0] - 1) * repeatedSelections; // Calculate number of combinations with repeated selections to remove
+//       combinationsWithoutRepeats = totalCombinations - repeatsToRemove; // Calculate number of combinations without repeats
+//     }
+//     if (samples[1] != 1) { // If there is more than one selection in the second row
+//       let repeatsToRemove = getCombination(row2Len - 1, samples[1] - 1) * repeatedSelections; // Calculate number of combinations with repeated selections to remove
+//       combinationsWithoutRepeats = totalCombinations - repeatsToRemove; // Calculate number of combinations without repeats
+//     }
+//     return combinationsWithoutRepeats;
+//   }
+
+/**
+ * Array of expected result strings for different patterns.
+ */
+let expectedResults: string[] = [
+  "Quintuple", // examples  [1,1,1,1,1]  [5,5,5,5,5]                        0
+  "Quadruple", // examples  [1,2,2,2,2]  [2,3,3,3,3] occ = 4                        1
+  "A Pair", // examples  [2,2,1,6,8]  [4,4,6,7,8] occ = 2                       2
+  "Triple Pair", // examples  [2,2,1,1,1]  [4,4,6,6,6] occ = 2 & occ = 3                        3
+  "Triple", // examples [6,6,6,4,7] [8,8,8,4,2] occ = 3                       4
+  "Two Pairs", //examples [2,2,1,1,3] [4,4,6,6,8] occ = 2 & occ = 2                       5
+  "Streak", // examples [1,2,3,4,5] [4,5,6,7,8] [6,7,8,9,0]                       6
+  "Lose Cards", //examples [2,4,6,9,1]                        7
+  "Half Streak", // examples [1,2,5] occ = 1                        8
+  "Pair", // examples [2,2,1,6,8] [4,4,6,7,8] occ = 2                       9
+  "Odd Odd", //examples [1,3] [7,3] just the first items of draw number
+  "Even Even", //examples [2,4] [4,8] just the first items of draw number
+  "Odd Even", //examples [2,3] [7,4] just the first items of draw number
+  "Even Odd", //examples [6,3] [0,3] just the first items of draw number
+];
+
+/**
+ * Analyzes and categorizes sets of draw numbers based on patterns and properties.
+ * @param drawNumbers - An array of draw numbers to analyze.
+ * @returns An object containing categorized results.
+ */
+// function studCategoriser13434(drawNumbers: number[]): Record<string, string[]> {
+//   let obj: Record<string, string[]> = {};
+//   let stud = filterFunction([
+//     quintuple([...drawNumbers]),
+//     quadruple(drawNumbers),
+//     aPair(drawNumbers),
+//     triplePair(drawNumbers),
+//     twoPair(drawNumbers),
+//     streak(drawNumbers),
+//     triple(drawNumbers)
+//   ]);
+//   let firstThree = filterFunction(analyzeArray(arraySlicer(drawNumbers, 0, 3)))
+//   let middleThree = filterFunction(analyzeArray(arraySlicer(drawNumbers, 1, 4)))
+//   let lastThree = filterFunction(analyzeArray(arraySlicer(drawNumbers, 2, 5)))
+//   let firstTwo = oddEvenClassifier(arraySlicer(drawNumbers, 0, 2))
+
+//   obj = {
+//     stud,
+//     firstThree,
+//     middleThree,
+//     lastThree,
+//     firstTwo,
+//   };
+
+//   console.log(obj);
+//   return obj;
+// }
+
+export function studCategoriser(drawNumbers: number[]): Record<string, string[]> {
+  let obj = {};
+  let stud = returnExpectResults(returnCountOfNumbers([...drawNumbers]), [...drawNumbers]);
+  let firstThree = categorizeResults(arraySlicer([...drawNumbers], 0, 3))
+  let middleThree = categorizeResults(arraySlicer([...drawNumbers], 1, 4))
+  let lastThree = categorizeResults(arraySlicer([...drawNumbers], 2, 5))
+  let firstTwo = oddEvenClassifier(arraySlicer([...drawNumbers], 0, 2))
+
+  obj = {
+    stud,
+    firstThree,
+    middleThree,
+    lastThree,
+    firstTwo
+  }
+
+  console.log(obj);
+  return obj;
+}
+function loseCard(drawNumbers: number[]) {
+  let loseCard = sortNumbersInArray(drawNumbers).some((_, i, arr) => {
+    return arr[i] + 1 === arr[i + 1] || arr[i] + 9 === arr[arr.length - 1];
+  });
+  return !loseCard && "Lose Cards";
+}
+
+
+function filterFunction(array: any[]): string[] {
+  return array.filter(item => item)
+}
+
+/**
+ * Analyzes an array of numbers and returns an array of analysis results.
+ * 
+ * @param numbers - An array of numbers to analyze.
+ * @returns An array containing analysis results including streak, triple, half streak, and pair information.
+ */
+function analyzeArray(numbers: number[]): (string | undefined)[] {
+  return [
+    streak(numbers),
+    triple(numbers),
+    isHalfStreak(numbers) && "Half Streak",
+    aPair(numbers)
+  ];
+}
+/**
+ * Checks if all elements in an array are the same and returns "Quintuple" if true.
+ * 
+ * @param drawnumbers - An array of numbers to check.
+ * @returns If all elements are the same, returns "Quintuple"; otherwise, returns undefined.
+ */
+function quintuple(drawnumbers: number[]): string | undefined {
+  return new Set(drawnumbers).size === 1 ? "Quintuple" : undefined;
+}
+
+/**
+ * Checks if there are exactly two unique elements in the array and returns "Quadruple" if true.
+ * 
+ * @param drawNumbers - An array of numbers to check.
+ * @returns If there are two unique elements, returns "Quadruple"; otherwise, returns undefined.
+ */
+function quadruple(drawNumbers: number[]): string | undefined {
+  return new Set(drawNumbers).size === 2 ? "Quadruple" : undefined;
+}
+
+/**
+* Checks if there are exactly three unique elements, each repeated twice, in the array and returns "Triple" if true.
+* 
+* @param drawNumbers - An array of numbers to check.
+* @returns If there are three unique elements repeated twice, returns "Triple"; otherwise, returns undefined.
+*/
+function triple(drawNumbers: number[]): string | undefined {
+  const countOfNumbers = returnCountOfNumbers(drawNumbers);
+  return hasKeyWithValue(countOfNumbers, 2) ? "Triple" : undefined;
+}
+
+/**
+* Checks if there is exactly one unique element repeated once, and the array length is greater than 3, 
+* and returns "A Pair" if true; otherwise, returns "Pair".
+* 
+* @param drawNumbers - An array of numbers to check.
+* @returns If there is one unique element repeated once and the array length > 3, returns "A Pair"; 
+*          otherwise, returns "Pair".
+*/
+function aPair(drawNumbers: number[]): string | boolean {
+  const countOfNumbers = returnCountOfNumbers(drawNumbers);
+  console.log("countOfNumbers", countOfNumbers)
+  return hasKeyWithValue(countOfNumbers, 1) ? drawNumbers.length === 3 ? "Pair" : "A Pair" : false;
+}
+
+
+/**
+* Checks if an object has a key with a specific value.
+* 
+* @param obj - The object to check.
+* @param targetValue - The value to search for.
+* @returns True if the object has a key with the specified value; otherwise, false.
+*/
+function hasKeyWithValue(obj: Record<string, number>, targetValue: number): boolean {
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key) && obj[key] > targetValue) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Checks if there are exactly two pairs of numbers and one triple in the array and returns "Triple Pair" if true.
+ * 
+ * @param drawNumbers - An array of numbers to check.
+ * @returns If there are two pairs and one triple, returns "Triple Pair"; otherwise, returns undefined.
+ */
+function triplePair(drawNumbers: number[]): string | undefined {
+  const countOfNumbers = returnCountOfNumbers(drawNumbers);
+  const values = sortNumbersInArray(Object.values(countOfNumbers));
+  return values[0] === 2 && values[1] === 3 ? "Triple Pair" : undefined;
+}
+
+/**
+* Checks if there are exactly two pairs of numbers in the array and returns "Two Pairs" if true.
+* 
+* @param drawNumbers - An array of numbers to check.
+* @returns If there are two pairs, returns "Two Pairs"; otherwise, returns undefined.
+*/
+function twoPair(drawNumbers: number[]): string | undefined {
+  const countOfNumbers = returnCountOfNumbers(drawNumbers);
+  const sortedValues = sortNumbersInArray(Object.values(countOfNumbers));
+  return JSON.stringify(sortedValues) === "[1,2,2]" ? "Two Pairs" : undefined;
+}
+
+
+
+/**
+ * Counts the occurrences of each number in an array.
+ * @param drawNumbers - The array of draw numbers.
+ * @returns An object containing the count of occurrences for each number.
+ */
+function returnCountOfNumbers(drawNumbers: number[]): Record<number, number> {
+  let count: Record<number, number> = {};
+  drawNumbers.forEach((item) => {
+    if (count[item]) {
+      count[item] += 1;
+    } else {
+      count[item] = 1;
+    }
+  });
+  return count;
+}
+
+/**
+ * Checks if the array of numbers has a streak and returns "Streak" if true.
+ * 
+ * @param drawNumbers - An array of numbers to check.
+ * @returns If there is a streak, returns "Streak"; otherwise, returns "Lose Cards".
+ */
+function streak(drawNumbers: number[]): string {
+  const isStreaks = isStreak(drawNumbers, 5);
+  return isStreaks ? "Streak" : "Lose Cards";
+}
+
+
+/**
+ * Returns the categorized results based on the occurrence of numbers and draw numbers.
+ * @param occurrence - An object containing the count of occurrences for each number.
+ * @param drawNumbers - An array of draw numbers.
+ * @returns An array of categorized results.
+ */
+function returnExpectResults(occurrence: Record<number, number>, drawNumbers: number[]): string[] {
+  let values = sortNumbersInArray(Object.values(occurrence), "asc");
+  let b: string[] = [];
+  let sorted = JSON.stringify(values);
+
+  switch (sorted) {
+    case "[5]":
+      b.push(expectedResults[0]);
+      break;
+    case "[1,4]":
+      b.push(expectedResults[1]);
+      break;
+    case "[1,1,1,2]":
+      b.push(expectedResults[2]);
+      break;
+    case "[2,3]":
+      b.push(expectedResults[3]);
+      break;
+    case "[1,1,3]":
+      b.push(expectedResults[4]);
+      break;
+    case "[1,2,2]":
+      b.push(expectedResults[5]);
+      break;
+    case "[1,1,1,1,1]":
+      if (isStreak(drawNumbers, 5)) {
+        b.push(expectedResults[6]);
+      } else {
+        b.push(expectedResults[7]);
+      }
+      break;
+    default:
+      return [];
+  }
+  return b;
+}
+
+/**
+ * Slices an array to return a subset of elements.
+ * @param drawNumbers - The array to be sliced.
+ * @param from - The index to start slicing from (inclusive).
+ * @param to - The index to end slicing at (exclusive).
+ * @returns A new array containing the sliced elements.
+ */
+function arraySlicer(drawNumbers: number[], from: number, to: number): number[] {
+  return drawNumbers.slice(from, to);
+}
+
+
+/**
+ * Categorizes draw numbers and returns corresponding result categories.
+ * @param drawNumbers - An array of draw numbers to categorize.
+ * @returns An array of categorized result strings.
+ */
+function categorizeResults(drawNumbers: number[]): string[] {
+  let values = sortNumbersInArray(Object.values(returnCountOfNumbers(drawNumbers)), "asc");
+  let b: string[] = [];
+  let sorted = JSON.stringify(values);
+
+  switch (sorted) {
+    case "[3]":
+      b.push(expectedResults[4]);
+      break;
+    case "[1,1,1]":
+      if (isStreak(drawNumbers, 3)) {
+        // console.log("dsfkdshnkfsdahfkhkasdhkfhksdakfjsdfdsbjbgbsgdsdgdksf")
+        b.push(expectedResults[6]);
+
+      } else if (isStreak(drawNumbers, 2)) {
+        b.push(expectedResults[8]);
+
+      } else {
+        b.push(expectedResults[7]);
+      }
+      break;
+    case "[1,2]":
+      b.push(expectedResults[2]);
+      break;
+    default:
+      return [];
+  }
+  return b;
+}
+
+/**
+ * Sorts an array of numbers in ascending or descending order.
+ * @param drawNumbers - The array of numbers to be sorted.
+ * @param order - The sorting order, "asc" for ascending (default) or "desc" for descending.
+ * @returns A new array containing the sorted numbers.
+ */
+function sortNumbersInArray(drawNumbers: number[], order: "asc" | "desc" = "asc"): number[] {
+  if (order === "desc") {
+    return drawNumbers.sort((a, b) => b - a);
+  } else {
+    return drawNumbers.sort((a, b) => a - b);
+  }
+}
+
+/**
+ * Checks if the given array of numbers forms a streak.
+ * @param array - The array of numbers to check for a streak.
+ * @returns True if the array forms a streak, otherwise false.
+ */
+// function isStreak(array: number[]): boolean {
+//   let streak = array.every((_, i, arr) => {
+//     if (i === arr.length - 1) return true;
+//     return arr[i] + 1 === arr[i + 1] || arr[i] + 9 === arr[arr.length - 1];
+//   });
+//   return streak;
+// }
+function isStreak(drawNumber: number[], streakLength: number): boolean {
+  const sortedDrawNumbers = [...drawNumber].sort((a, b) => a - b);
+
+  for (let i = 0; i < sortedDrawNumbers.length; i++) {
+    let count = 1;
+    let currentIndex = i;
+
+    for (let j = 0; j < streakLength - 1; j++) {
+      const nextIndex = (currentIndex + 1) % sortedDrawNumbers.length;
+
+      if (sortedDrawNumbers[nextIndex] === sortedDrawNumbers[currentIndex] + 1 ||
+        (sortedDrawNumbers[nextIndex] === 0 && sortedDrawNumbers[currentIndex] === 9)) {
+        count++;
+        currentIndex = nextIndex;
+      } else {
+        break;
+      }
+    }
+
+    if (count === streakLength) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+/**
+ * Checks if the given array of numbers forms a half-streak.
+ * @param array - The array of numbers to check for a half-streak.
+ * @returns True if the array forms a half-streak, otherwise false.
+ */
+function isHalfStreak(array: number[]): any {
+  let streak = sortNumbersInArray(array).some((_, i, arr) => {
+    return arr[i] + 1 === arr[i + 1] || arr[i] + 9 === arr[arr.length - 1];
+  });
+  return streak;
+}
+
+/**
+ * Determines whether each number in the given array is odd or even.
+ * @param drawNumber - The array of numbers to classify as odd or even.
+ * @returns An array containing the classification of each number as "Odd" or "Even".
+ */
+function oddEvenClassifier(drawNumber: number[]): string[] {
+  let final = "";
+  drawNumber.forEach((item) => {
+    if (item % 2 === 0) {
+      final += "Even ";
+    } else {
+      final += "Odd ";
+    }
+  });
+  return [final.trim()];
+}
+
+
+export const proccessBoardGamesBullBetInfo = (bet: any, dataToServer: any, gameIDs: any) => {
+  let results = [];
+  let result = {};
+  for (let i = 0; i < dataToServer.length; i++) {
+    const { money, unit, value, name, pos, gameId } = dataToServer[i];
+    bet = {
+      ...bet,
+      allSelections: pos ? [{ [name]: pos }] : [[gameIDs[value]]], //[[1]]
+      userSelections: userSelections([name ?? "", value]),
+      totalBetAmt: money,
+      game_label: value,
+      unitStaked: unit,
+      gameId: gameId,
+    };
+    result = { ...result, ...bet };
+    results.push(result);
+  }
+  return results;
+};
+
+export const proccessBoardGamesStudBetInfo = (bet: any, dataToServer: any) => {
+  let results = [];
+  let result = {};
+  for (let i = 0; i < dataToServer.length; i++) {
+    const { money, unit, value, id, gameId } = dataToServer[i];
+    const gameName =
+      gameId === 6
+        ? "First 3"
+        : gameId === 7
+          ? "Middle 3"
+          : gameId === 8
+            ? "Last 3"
+            : "Stud";
+
+    bet = {
+      ...bet,
+      allSelections: [[id]], //[[1]]
+      userSelections: userSelections([gameName, value]),
+      totalBetAmt: money,
+      game_label: value,
+      unitStaked: unit,
+      gameId,
+    };
+    result = { ...result, ...bet };
+    results.push(result);
+  }
+  return results;
+};
+
+export const proccessBoardGamesBaccaratBetInfo = (bet: any, dataToServer: any) => {
+  let results = [];
+  let result = {};
+  for (let i = 0; i < dataToServer.length; i++) {
+    const { id, money, unit, value } = dataToServer[i];
+    bet = {
+      ...bet,
+      allSelections: [id],
+      userSelections: userSelections([value]),
+      totalBetAmt: money,
+      game_label: value,
+      unitStaked: unit,
+      gameId: 10,
+    };
+    result = { ...result, ...bet };
+    results.push(result);
+  }
+  return results;
+};
+
+interface LongDragonSelection {
+  userSelection: string;
+  game_id: number;
+  game_name: string;
+  amount: number;
+  lottery_id: string;
+}
+
+interface LongDragonData {
+  gameid: number;
+  // ... (other properties)
+}
+
+export function filterLongDragonSelection(
+  longDragonSelections: Record<string, LongDragonSelection>,
+  longDragonData: LongDragonData[]
+): Record<string, LongDragonSelection> {
+  const buttons = ["button1", "button2"];
+  const toBeDeleted: string[] = [];
+
+  buttons.forEach((button) => {
+    Object.values(longDragonSelections).forEach((item) => {
+      longDragonData.forEach((val: any) => {
+        if (
+          val[button] === item.userSelection &&
+          val.lottery_id === item.lottery_id &&
+          val.gameid === item.game_id
+        ) {
+          toBeDeleted.push(
+            item.userSelection + item.game_id + item.lottery_id
+          );
+          console.log(item.userSelection + item.game_id + item.lottery_id);
+        }
+      });
+    });
+  });
+
+  const keysToKeep = Object.keys(longDragonSelections).filter((key) => {
+    const keyExistsInArray = toBeDeleted.includes(key);
+    return keyExistsInArray;
+  });
+
+  const newLongDragonSelections: Record<
+    string,
+    LongDragonSelection
+  > = keysToKeep.reduce((obj: any, key) => {
+    obj[key] = longDragonSelections[key];
+    return obj;
+  }, {});
+
+  return newLongDragonSelections;
+}
+
+function getCombinations(array: any, r: any) {
+  const result: any = [];
+  // Recursive function to generate combinations
+  function generateCombos(combination: any, index: any) {
+    if (combination.length === r) {
+      result.push(combination);
+      return;
+    }
+
+    if (index >= array.length) {
+      return;
+    }
+    const newCombo = [...combination];
+    newCombo.push(array[index]);
+
+    generateCombos(newCombo, index + 1);
+    generateCombos(combination, index + 1);
+  }
+
+  generateCombos([], 0);
+  return result;
+}
+
+
+export function BullBullFunc(drawNumbers: any) {
+  let drawNumbersCombinations = getCombinations(drawNumbers, 3);
+  let qualifiedNumbers;
+
+  for (let i = 0; i < drawNumbersCombinations.length; i++) {
+    let total = drawNumbersCombinations[i].reduce((a: any, b: any) => a + b, 0);
+    if (total === 10) {
+      // get the array index of the number that is not 10
+      qualifiedNumbers = drawNumbersCombinations[i];
+      break;
+    } else {
+      qualifiedNumbers = [];
+    }
+  }
+
+  let indexOfQualifiedNumbers = indexesOfQualifiedNumbersFunc(
+    drawNumbers,
+    qualifiedNumbers
+  );
+  let results = drawNumbers.filter((_: any, i: any) => !indexOfQualifiedNumbers.includes(i));
+  let bullN;
+  let bullBul;
+  let smallAndBig;
+  let evenAndOdd;
+  let noBull;
+
+  console.log("indexOfQualifiedNumbers ", indexOfQualifiedNumbers);
+  console.log("qualifiedNumbers ", qualifiedNumbers);
+  console.log("results ", results);
+
+  if (qualifiedNumbers.length === 0) {
+    noBull = "No Bull";
+  } else {
+    let sumOfRemainingDigits = results.reduce((prev: any, curr: any) => prev + curr, 0);
+    let lastDigit = +sumOfRemainingDigits.toString().padStart(2, "0")[1]; // get the last digit
+    console.log("lastDigit ", lastDigit)
+    bullN = "Bull " + lastDigit;
+    bullBul = lastDigit === 0 ? "Bull Bull" : bullN;
+    smallAndBig = lastDigit < 6 ? "Bull small" : "Bull big";
+    evenAndOdd = lastDigit % 2 === 0 ? "Bull even" : "Bull odd";
+  }
+
+  let Max = drawNumbers.reduce((prev: any, curr: any) => Math.max(prev, curr));
+  let maxRange = ["ten thousand", "thousand", "hundreds", "tens", "once"];
+  let maxIndex = maxRange[drawNumbers.indexOf(Max)];
+
+  let minrange = ["Ten thousand", "Thousand", "Hundreds", "Tens", "Once"];
+  let Min = drawNumbers.reduce((prev: any, curr: any) => Math.min(prev, curr));
+  let minIndex = minrange[drawNumbers.indexOf(Min)];
+  // 82731
+  //85475
+  let dragonAndTiger = drawNumbers
+    .slice(3, 5)
+    .reduce((prev: any, curr: any) =>
+      prev > curr ? "Dragon" : prev < curr ? "Tiger" : "And"
+    );
+
+  return [
+    bullBul,
+    smallAndBig,
+    evenAndOdd,
+    dragonAndTiger,
+    maxIndex,
+    minIndex,
+    noBull,
+  ];
+}
+
+function indexesOfQualifiedNumbersFunc(drawNumbers: any[], values: any) {
+  let indexes = [];
+  let removeDuplicate = [...new Set(drawNumbers)];
+
+  if (values[0] === values[1] && values[1] === values[2]) {
+    for (let i = 0; i < drawNumbers.length; i++) {
+      if (drawNumbers[i] === values[0] || drawNumbers[i] === values[1]) {
+        indexes.push(i);
+      }
+    }
+  } else {
+    removeDuplicate.forEach((item, index) => {
+      if (item === values[0] || item === values[1] || item === values[2]) {
+        indexes.push(drawNumbers.lastIndexOf(item));
+      }
+    });
+  }
+  return indexes;
+}
+
+
+/**
+ * Generates a random password with at least one uppercase letter, one lowercase letter,
+ * one number, and one symbol.
+ * @returns {string} The generated password.
+ */
+function generateRandomPasswordsssss(): string {
+  const alphabetsCaps = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const smallLetters = "abcdefghijklmnopqrstuvwxyz";
+  const numbers = "0123456789";
+  const symbols = ["@", "#", "$", ".", "&", "|", "!", "?", "%", "*", "(", ")", "-", "_", "+", "=", "/", "\\", ":", ";", ",", "~", "`", "<", ">", "[", "]", "{", "}"];
+
+  /**
+   * Get a random character from a given set of characters.
+   * @param {string[]} characters - The set of characters.
+   * @returns {string} A randomly selected character.
+   */
+  function getRandomCharacter(characters: string[]): string {
+      return characters[Math.floor(Math.random() * characters.length)];
+  }
+
+  // Initial password with one character from each category
+  let password = [
+      getRandomCharacter(alphabetsCaps),
+      getRandomCharacter(smallLetters),
+      getRandomCharacter(numbers),
+      getRandomCharacter(symbols),
+  ].join('');
+
+  // Add three more characters, one from each category
+  for (let i = 0; i < 3; i++) {
+      let randomIndex = Math.floor(Math.random() * 4);
+      switch (randomIndex) {
+          case 0:
+              password += getRandomCharacter(alphabetsCaps);
+              break;
+          case 1:
+              password += getRandomCharacter(smallLetters);
+              break;
+          case 2:
+              password += getRandomCharacter(numbers);
+              break;
+          case 3:
+              password += getRandomCharacter(symbols);
+              break;
+      }
+  }
+
+  return password;
+}
+
+/**
+* Generates a random password with at least one character from each category:
+* uppercase letter, lowercase letter, number, and symbol.
+* @returns {string} The generated password.
+ form chat
+*/
+function generateRandomPasswordssssssss(): string {
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$.&|!?%*()-_+=/\\:;~`<>[]{},";
+  
+  /**
+   * Get a random character from the character set.
+   * @returns {string} A randomly selected character.
+   */
+  function getRandomCharacter(): string {
+      return characters[Math.floor(Math.random() * characters.length)];
+  }
+
+  // Create a set to ensure uniqueness
+  const characterSet = new Set([
+      getRandomCharacter(),
+      getRandomCharacter(),
+      getRandomCharacter(),
+      getRandomCharacter(),
+  ]);
+
+  // Convert the set to an array
+  const uniqueCharacters = Array.from(characterSet);
+
+  // Shuffle the remaining characters
+  const shuffledCharacters = [...characters].sort(() => Math.random() - 0.5);
+
+  // Add three more characters, one from each category
+  for (let i = 0; i < 3; i++) {
+      uniqueCharacters.push(shuffledCharacters[i]);
+  }
+
+  return uniqueCharacters.join('');
+}
+
+
+export function generateRandomPassword(){
+  const alphabetsCaps = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  const smallLetters = "abcdefghijklmnopqrstuvwxyz";
+  const numbers = "0123456789";
+  const symbols = ["@", "#", "$",".", "&", "|", "!", "?", "%", "*", "(", ")", "-", "_", "+", "=", "/", "\\", ":", ";", ",", "~", "`", "<", ">", "[", "]", "{", "}"]
+
+  
+  function getRandomCharacter(characters) {
+      return characters[Math.floor(Math.random() * characters.length)];
+  }
+  
+  let password = [
+      getRandomCharacter(alphabetsCaps),
+      getRandomCharacter(smallLetters),
+      getRandomCharacter(numbers),
+      getRandomCharacter(symbols),
+  ].join('');
+
+  for(let i = 0; i < 4; i++){
+      let randomIndex = Math.floor(Math.random() * 3);
+      switch(randomIndex){
+          case 0:
+              password += getRandomCharacter(alphabetsCaps);
+              break;
+          case 1:
+              password += getRandomCharacter(smallLetters);
+              break;
+          case 2:
+              password += getRandomCharacter(numbers);
+              break;
+          case 3:
+              password += getRandomCharacter(symbols);
+              break;
+      }
+  }
+  return password;
+}
+
+export function generateRandomPasswords() {
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$.&|!?%*()-_+=/\\:;~`<>[]{},";
+  
+  function getRandomCharacter() {
+      return characters[Math.floor(Math.random() * characters.length)];
+  }
+
+  const characterSet = new Set([
+      getRandomCharacter(),
+      getRandomCharacter(),
+      getRandomCharacter(),
+      getRandomCharacter(),
+  ]);
+
+  const uniqueCharacters = Array.from(characterSet);
+  const shuffledCharacters = [...characters].sort(() => Math.random() - 0.5);
+
+  for (let i = 0; i < 4; i++) {
+      uniqueCharacters.push(shuffledCharacters[i]);
+  }
+
+  return uniqueCharacters.join('');
+}
