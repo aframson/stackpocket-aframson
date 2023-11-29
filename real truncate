@@ -1,0 +1,21 @@
+
+export function truncate(number) {
+  // Convert the number to a string
+  const numStr = number.toString();
+
+  // Split the number into whole and decimal parts
+  const parts = numStr.split('.');
+
+  // If there's no decimal part, add '.000'
+  if (parts.length === 1) {
+      return numStr + '.000';
+  }
+
+  // If the decimal part is less than 3 digits, add the necessary number of zeros
+  if (parts[1].length < 3) {
+      return numStr + '0'.repeat(3 - parts[1].length);
+  }
+
+  // If the decimal part is more than 3 digits, truncate it to 3 digits without rounding
+  return parts[0] + '.' + parts[1].substr(0, 3);
+}
