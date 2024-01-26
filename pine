@@ -1,0 +1,33 @@
+
+from sentence_transformers import SentenceTransformer
+import numpy as np
+
+# Define the sentence and vocabulary
+sentence = "you have good eyes for beauty"
+vocabs = ["Prolific", "Proliferation", "Aesthetic", "Agenda", "Aggregator", "Align", "Assertive", "Assimilate", "Assumption", "Attain", "Attribute", "Augment", "Authentic", "Benevolent", "Bolster", "Burgeoning", "Catalyst", "Circumvent", "Cohesive", "Collaborate", "Comprehensive", "Conceive", "Conducive", "Conform", "Conscientious", "Constrain", "Contemplate"]
+
+# Load the SentenceTransformer model
+model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
+
+# Encode all the words in one batch
+all_words = sentence.split() + vocabs
+embeddings = model.encode(all_words, convert_to_tensor=True)
+
+# Split the embeddings back into sentence words and vocab words
+sentence_embeddings = embeddings[:len(sentence.split())]
+vocab_embeddings = embeddings[len(sentence.split()):]
+
+# Compute the cosine similarity between each pair of sentence and vocab word
+similarity_matrix = np.inner(sentence_embeddings, vocab_embeddings)
+# similar words container
+similar_words = []
+
+# Iterate through the similarity matrix and find similar words
+for i, sentence_word in enumerate(sentence.split()):
+    for j, vocab_word in enumerate(vocabs):
+        similarity = similarity_matrix[i, j].item()
+        if similarity > 0.4:
+            similar_words.append((sentence_word, vocab_word, similarity))
+
+# Print the similar words
+print(similar_words)
