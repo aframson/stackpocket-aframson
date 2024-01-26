@@ -1,0 +1,1790 @@
+{
+    "all5": [
+      {
+        "hid": 215,
+        "winning": "3,3,3,9,1",
+        "g120": "3",
+        "g60": "46",
+        "g30": "69",
+        "g20": "g20",
+        "g10": "1",
+        "g5": "48",
+        "date_created": ""
+      },
+      {
+        "hid": 214,
+        "winning": "3,3,3,9,9",
+        "g120": "2",
+        "g60": "45",
+        "g30": "68",
+        "g20": "53",
+        "g10": "g10",
+        "g5": "47",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 213,
+        "winning": "1,1,2,2,2",
+        "g120": "1",
+        "g60": "44",
+        "g30": "67",
+        "g20": "52",
+        "g10": "g10",
+        "g5": "46",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 212,
+        "winning": "3,3,3,6,6",
+        "g120": "g120",
+        "g60": "43",
+        "g30": "66",
+        "g20": "51",
+        "g10": "79",
+        "g5": "45",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 211,
+        "winning": "3,3,3,6,6",
+        "g120": "g120",
+        "g60": "42",
+        "g30": "65",
+        "g20": "50",
+        "g10": "78",
+        "g5": "44",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 210,
+        "winning": "1,2,3,3,5",
+        "g120": "g120",
+        "g60": "41",
+        "g30": "64",
+        "g20": "49",
+        "g10": "77",
+        "g5": "43",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 209,
+        "winning": "1,2,3,3,5",
+        "g120": "g120",
+        "g60": "40",
+        "g30": "63",
+        "g20": "48",
+        "g10": "76",
+        "g5": "42",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 208,
+        "winning": "1,2,3,3,5",
+        "g120": "g120",
+        "g60": "39",
+        "g30": "62",
+        "g20": "47",
+        "g10": "75",
+        "g5": "41",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 207,
+        "winning": "3,3,3,1,2",
+        "g120": "g120",
+        "g60": "38",
+        "g30": "61",
+        "g20": "46",
+        "g10": "74",
+        "g5": "40",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 206,
+        "winning": "2,2,3,3,4",
+        "g120": "g120",
+        "g60": "37",
+        "g30": "60",
+        "g20": "45",
+        "g10": "73",
+        "g5": "39",
+        "date_created": "2024-01-23"
+      }
+    ],
+    "all4": {
+      "first4": [
+        {
+          "hid": 140,
+          "winning": "3,3,3,9,1",
+          "group24": "2",
+          "group12": "62",
+          "group6": "55",
+          "group4": "group4",
+          "date_created": ""
+        },
+        {
+          "hid": 139,
+          "winning": "3,3,3,9,9",
+          "group24": "1",
+          "group12": "61",
+          "group6": "54",
+          "group4": "group4",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 138,
+          "winning": "3,3,3,6,6",
+          "group24": "group24",
+          "group12": "60",
+          "group6": "53",
+          "group4": "41",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 137,
+          "winning": "3,3,3,6,6",
+          "group24": "group24",
+          "group12": "59",
+          "group6": "52",
+          "group4": "40",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 136,
+          "winning": "1,2,3,3,5",
+          "group24": "group24",
+          "group12": "58",
+          "group6": "51",
+          "group4": "39",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 135,
+          "winning": "1,2,3,3,5",
+          "group24": "group24",
+          "group12": "57",
+          "group6": "50",
+          "group4": "38",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 134,
+          "winning": "3,3,3,1,2",
+          "group24": "group24",
+          "group12": "56",
+          "group6": "49",
+          "group4": "37",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 133,
+          "winning": "2,2,3,3,4",
+          "group24": "group24",
+          "group12": "55",
+          "group6": "48",
+          "group4": "36",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 132,
+          "winning": "2,0,0,0,2",
+          "group24": "group24",
+          "group12": "54",
+          "group6": "47",
+          "group4": "35",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 131,
+          "winning": "1,0,0,0,2",
+          "group24": "group24",
+          "group12": "53",
+          "group6": "46",
+          "group4": "34",
+          "date_created": "2024-01-23"
+        }
+      ],
+      "last4": [
+        {
+          "hid": 123,
+          "winning": "3,3,3,9,1",
+          "group24": "2",
+          "group12": "group12",
+          "group6": "1",
+          "group4": "43",
+          "date_created": ""
+        },
+        {
+          "hid": 122,
+          "winning": "3,3,3,9,9",
+          "group24": "1",
+          "group12": "48",
+          "group6": "group6",
+          "group4": "42",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 121,
+          "winning": "3,3,3,6,6",
+          "group24": "group24",
+          "group12": "47",
+          "group6": "42",
+          "group4": "41",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 120,
+          "winning": "3,3,3,6,6",
+          "group24": "group24",
+          "group12": "46",
+          "group6": "41",
+          "group4": "40",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 119,
+          "winning": "1,2,3,3,5",
+          "group24": "group24",
+          "group12": "45",
+          "group6": "40",
+          "group4": "39",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 118,
+          "winning": "1,2,3,3,5",
+          "group24": "group24",
+          "group12": "44",
+          "group6": "39",
+          "group4": "38",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 117,
+          "winning": "3,3,3,1,2",
+          "group24": "group24",
+          "group12": "43",
+          "group6": "38",
+          "group4": "37",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 116,
+          "winning": "2,2,3,3,4",
+          "group24": "group24",
+          "group12": "42",
+          "group6": "37",
+          "group4": "36",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 115,
+          "winning": "2,0,0,0,2",
+          "group24": "group24",
+          "group12": "41",
+          "group6": "36",
+          "group4": "35",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 114,
+          "winning": "1,0,0,0,2",
+          "group24": "group24",
+          "group12": "40",
+          "group6": "35",
+          "group4": "34",
+          "date_created": "2024-01-23"
+        }
+      ]
+    },
+    "all3": {
+      "first3": [
+        {
+          "hid": 119,
+          "winning": "3,3,3,9,1",
+          "first3sum": "9",
+          "first3span": "0",
+          "first3group3": "1",
+          "first3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 118,
+          "winning": "3,3,3,9,9",
+          "first3sum": "9",
+          "first3span": "0",
+          "first3group3": "1",
+          "first3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 117,
+          "winning": "3,3,3,6,6",
+          "first3sum": "9",
+          "first3span": "0",
+          "first3group3": "1",
+          "first3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 116,
+          "winning": "3,3,3,6,6",
+          "first3sum": "9",
+          "first3span": "0",
+          "first3group3": "1",
+          "first3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 115,
+          "winning": "1,2,3,3,5",
+          "first3sum": "6",
+          "first3span": "2",
+          "first3group3": "1",
+          "first3group6": "group6",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 114,
+          "winning": "1,2,3,3,5",
+          "first3sum": "6",
+          "first3span": "2",
+          "first3group3": "1",
+          "first3group6": "group6",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 113,
+          "winning": "3,3,3,1,2",
+          "first3sum": "9",
+          "first3span": "0",
+          "first3group3": "1",
+          "first3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 112,
+          "winning": "2,2,3,3,4",
+          "first3sum": "7",
+          "first3span": "1",
+          "first3group3": "group3",
+          "first3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 111,
+          "winning": "2,0,0,0,2",
+          "first3sum": "2",
+          "first3span": "2",
+          "first3group3": "group3",
+          "first3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 110,
+          "winning": "1,0,0,0,2",
+          "first3sum": "1",
+          "first3span": "1",
+          "first3group3": "group3",
+          "first3group6": "1",
+          "date_created": "2024-01-23"
+        }
+      ],
+      "mid3": [
+        {
+          "hid": 117,
+          "winning": "3,3,3,9,1",
+          "mid3sum": "15",
+          "mid3span": "6",
+          "mid3group3": "group3",
+          "mid3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 116,
+          "winning": "3,3,3,9,9",
+          "mid3sum": "15",
+          "mid3span": "6",
+          "mid3group3": "group3",
+          "mid3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 115,
+          "winning": "3,3,3,6,6",
+          "mid3sum": "12",
+          "mid3span": "3",
+          "mid3group3": "group3",
+          "mid3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 114,
+          "winning": "3,3,3,6,6",
+          "mid3sum": "12",
+          "mid3span": "3",
+          "mid3group3": "group3",
+          "mid3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 113,
+          "winning": "1,2,3,3,5",
+          "mid3sum": "8",
+          "mid3span": "1",
+          "mid3group3": "group3",
+          "mid3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 112,
+          "winning": "1,2,3,3,5",
+          "mid3sum": "8",
+          "mid3span": "1",
+          "mid3group3": "group3",
+          "mid3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 111,
+          "winning": "3,3,3,1,2",
+          "mid3sum": "7",
+          "mid3span": "2",
+          "mid3group3": "group3",
+          "mid3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 110,
+          "winning": "2,2,3,3,4",
+          "mid3sum": "8",
+          "mid3span": "1",
+          "mid3group3": "group3",
+          "mid3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 109,
+          "winning": "2,0,0,0,2",
+          "mid3sum": "0",
+          "mid3span": "0",
+          "mid3group3": "1",
+          "mid3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 108,
+          "winning": "1,0,0,0,2",
+          "mid3sum": "0",
+          "mid3span": "0",
+          "mid3group3": "1",
+          "mid3group6": "1",
+          "date_created": "2024-01-23"
+        }
+      ],
+      "last3": [
+        {
+          "hid": 117,
+          "winning": "3,3,3,9,1",
+          "last3sum": "13",
+          "last3span": "8",
+          "last3group3": "1",
+          "last3group6": "group6",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 116,
+          "winning": "3,3,3,9,9",
+          "last3sum": "21",
+          "last3span": "6",
+          "last3group3": "group3",
+          "last3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 115,
+          "winning": "3,3,3,6,6",
+          "last3sum": "15",
+          "last3span": "3",
+          "last3group3": "group3",
+          "last3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 114,
+          "winning": "3,3,3,6,6",
+          "last3sum": "15",
+          "last3span": "3",
+          "last3group3": "group3",
+          "last3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 113,
+          "winning": "1,2,3,3,5",
+          "last3sum": "11",
+          "last3span": "2",
+          "last3group3": "group3",
+          "last3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 112,
+          "winning": "1,2,3,3,5",
+          "last3sum": "11",
+          "last3span": "2",
+          "last3group3": "group3",
+          "last3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 111,
+          "winning": "3,3,3,1,2",
+          "last3sum": "6",
+          "last3span": "2",
+          "last3group3": "1",
+          "last3group6": "group6",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 110,
+          "winning": "2,2,3,3,4",
+          "last3sum": "10",
+          "last3span": "1",
+          "last3group3": "group3",
+          "last3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 109,
+          "winning": "2,0,0,0,2",
+          "last3sum": "2",
+          "last3span": "2",
+          "last3group3": "group3",
+          "last3group6": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 108,
+          "winning": "1,0,0,0,2",
+          "last3sum": "2",
+          "last3span": "2",
+          "last3group3": "group3",
+          "last3group6": "1",
+          "date_created": "2024-01-23"
+        }
+      ]
+    },
+    "all2": {
+      "first2": [
+        {
+          "hid": 135,
+          "winning": "3,3,3,9,1",
+          "first2sum": "6",
+          "first2span": "0",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 134,
+          "winning": "3,3,3,9,9",
+          "first2sum": "6",
+          "first2span": "0",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 133,
+          "winning": "3,3,3,6,6",
+          "first2sum": "6",
+          "first2span": "0",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 132,
+          "winning": "3,3,3,6,6",
+          "first2sum": "6",
+          "first2span": "0",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 131,
+          "winning": "1,2,3,3,5",
+          "first2sum": "3",
+          "first2span": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 130,
+          "winning": "1,2,3,3,5",
+          "first2sum": "3",
+          "first2span": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 129,
+          "winning": "3,3,3,1,2",
+          "first2sum": "6",
+          "first2span": "0",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 128,
+          "winning": "2,2,3,3,4",
+          "first2sum": "4",
+          "first2span": "0",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 127,
+          "winning": "2,0,0,0,2",
+          "first2sum": "2",
+          "first2span": "2",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 126,
+          "winning": "1,0,0,0,2",
+          "first2sum": "1",
+          "first2span": "1",
+          "date_created": "2024-01-23"
+        }
+      ],
+      "last2": [
+        {
+          "hid": 171,
+          "winning": "3,3,3,9,1",
+          "last2sum": "10",
+          "last2span": "8",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 170,
+          "winning": "3,3,3,9,9",
+          "last2sum": "18",
+          "last2span": "0",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 169,
+          "winning": "3,3,3,6,6",
+          "last2sum": "12",
+          "last2span": "0",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 168,
+          "winning": "3,3,3,6,6",
+          "last2sum": "12",
+          "last2span": "0",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 167,
+          "winning": "1,2,3,3,5",
+          "last2sum": "8",
+          "last2span": "2",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 166,
+          "winning": "1,2,3,3,5",
+          "last2sum": "8",
+          "last2span": "2",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 165,
+          "winning": "3,3,3,1,2",
+          "last2sum": "3",
+          "last2span": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 164,
+          "winning": "2,2,3,3,4",
+          "last2sum": "7",
+          "last2span": "1",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 163,
+          "winning": "2,0,0,0,2",
+          "last2sum": "2",
+          "last2span": "2",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 162,
+          "winning": "1,0,0,0,2",
+          "last2sum": "2",
+          "last2span": "2",
+          "date_created": "2024-01-23"
+        }
+      ]
+    },
+    "threecard": {
+      "first3": [
+        {
+          "hid": 100,
+          "winning": "3,3,3,9,1",
+          "first3": "toak",
+          "mid3": "pair",
+          "last3": "mixed",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 99,
+          "winning": "3,3,3,9,9",
+          "first3": "toak",
+          "mid3": "pair",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 98,
+          "winning": "3,3,3,6,6",
+          "first3": "toak",
+          "mid3": "pair",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 97,
+          "winning": "3,3,3,6,6",
+          "first3": "toak",
+          "mid3": "pair",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 96,
+          "winning": "1,2,3,3,5",
+          "first3": "mixed",
+          "mid3": "pair",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 95,
+          "winning": "1,2,3,3,5",
+          "first3": "mixed",
+          "mid3": "pair",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 94,
+          "winning": "3,3,3,1,2",
+          "first3": "toak",
+          "mid3": "pair",
+          "last3": "mixed",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 93,
+          "winning": "2,2,3,3,4",
+          "first3": "pair",
+          "mid3": "pair",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 92,
+          "winning": "2,0,0,0,2",
+          "first3": "pair",
+          "mid3": "toak",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 91,
+          "winning": "1,0,0,0,2",
+          "first3": "pair",
+          "mid3": "toak",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        }
+      ],
+      "mid3": [
+        {
+          "hid": 100,
+          "winning": "3,3,3,9,1",
+          "first3": "toak",
+          "mid3": "pair",
+          "last3": "mixed",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 99,
+          "winning": "3,3,3,9,9",
+          "first3": "toak",
+          "mid3": "pair",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 98,
+          "winning": "3,3,3,6,6",
+          "first3": "toak",
+          "mid3": "pair",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 97,
+          "winning": "3,3,3,6,6",
+          "first3": "toak",
+          "mid3": "pair",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 96,
+          "winning": "1,2,3,3,5",
+          "first3": "mixed",
+          "mid3": "pair",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 95,
+          "winning": "1,2,3,3,5",
+          "first3": "mixed",
+          "mid3": "pair",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 94,
+          "winning": "3,3,3,1,2",
+          "first3": "toak",
+          "mid3": "pair",
+          "last3": "mixed",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 93,
+          "winning": "2,2,3,3,4",
+          "first3": "pair",
+          "mid3": "pair",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 92,
+          "winning": "2,0,0,0,2",
+          "first3": "pair",
+          "mid3": "toak",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 91,
+          "winning": "1,0,0,0,2",
+          "first3": "pair",
+          "mid3": "toak",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        }
+      ],
+      "last3": [
+        {
+          "hid": 100,
+          "winning": "3,3,3,9,1",
+          "first3": "toak",
+          "mid3": "pair",
+          "last3": "mixed",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 99,
+          "winning": "3,3,3,9,9",
+          "first3": "toak",
+          "mid3": "pair",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 98,
+          "winning": "3,3,3,6,6",
+          "first3": "toak",
+          "mid3": "pair",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 97,
+          "winning": "3,3,3,6,6",
+          "first3": "toak",
+          "mid3": "pair",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 96,
+          "winning": "1,2,3,3,5",
+          "first3": "mixed",
+          "mid3": "pair",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 95,
+          "winning": "1,2,3,3,5",
+          "first3": "mixed",
+          "mid3": "pair",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 94,
+          "winning": "3,3,3,1,2",
+          "first3": "toak",
+          "mid3": "pair",
+          "last3": "mixed",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 93,
+          "winning": "2,2,3,3,4",
+          "first3": "pair",
+          "mid3": "pair",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 92,
+          "winning": "2,0,0,0,2",
+          "first3": "pair",
+          "mid3": "toak",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 91,
+          "winning": "1,0,0,0,2",
+          "first3": "pair",
+          "mid3": "toak",
+          "last3": "pair",
+          "date_created": "2024-01-23"
+        }
+      ]
+    },
+    "bsoe": {
+      "first2": [
+        {
+          "hid": 93,
+          "winning": "3,3,3,9,1",
+          "num1": "S O",
+          "num2": "S O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 92,
+          "winning": "3,3,3,9,9",
+          "num1": "S O",
+          "num2": "S O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 91,
+          "winning": "3,3,3,6,6",
+          "num1": "S O",
+          "num2": "S O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 90,
+          "winning": "3,3,3,6,6",
+          "num1": "S O",
+          "num2": "S O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 89,
+          "winning": "1,2,3,3,5",
+          "num1": "S O",
+          "num2": "S E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 88,
+          "winning": "1,2,3,3,5",
+          "num1": "S O",
+          "num2": "S E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 87,
+          "winning": "3,3,3,1,2",
+          "num1": "S O",
+          "num2": "S O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 86,
+          "winning": "2,2,3,3,4",
+          "num1": "S E",
+          "num2": "S E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 85,
+          "winning": "2,0,0,0,2",
+          "num1": "S E",
+          "num2": "S E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 84,
+          "winning": "1,0,0,0,2",
+          "num1": "S O",
+          "num2": "S E",
+          "date_created": "2024-01-23"
+        }
+      ],
+      "last2": [
+        {
+          "hid": 74,
+          "winning": "3,3,3,9,1",
+          "num1": "B O",
+          "num2": "S O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 73,
+          "winning": "3,3,3,9,9",
+          "num1": "B O",
+          "num2": "B O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 72,
+          "winning": "3,3,3,6,6",
+          "num1": "B E",
+          "num2": "B E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 71,
+          "winning": "3,3,3,6,6",
+          "num1": "B E",
+          "num2": "B E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 70,
+          "winning": "1,2,3,3,5",
+          "num1": "S O",
+          "num2": "B O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 69,
+          "winning": "1,2,3,3,5",
+          "num1": "S O",
+          "num2": "B O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 68,
+          "winning": "3,3,3,1,2",
+          "num1": "S O",
+          "num2": "S E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 67,
+          "winning": "2,2,3,3,4",
+          "num1": "S O",
+          "num2": "S E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 66,
+          "winning": "2,0,0,0,2",
+          "num1": "S E",
+          "num2": "S E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 65,
+          "winning": "1,0,0,0,2",
+          "num1": "S E",
+          "num2": "S E",
+          "date_created": "2024-01-23"
+        }
+      ],
+      "first3": [
+        {
+          "hid": 87,
+          "winning": "3,3,3,9,1",
+          "sum": "9",
+          "num1": "S O",
+          "num2": "S O",
+          "num3": "S O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 86,
+          "winning": "3,3,3,9,9",
+          "sum": "9",
+          "num1": "S O",
+          "num2": "S O",
+          "num3": "S O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 85,
+          "winning": "3,3,3,6,6",
+          "sum": "9",
+          "num1": "S O",
+          "num2": "S O",
+          "num3": "S O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 84,
+          "winning": "3,3,3,6,6",
+          "sum": "9",
+          "num1": "S O",
+          "num2": "S O",
+          "num3": "S O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 83,
+          "winning": "1,2,3,3,5",
+          "sum": "6",
+          "num1": "S O",
+          "num2": "S E",
+          "num3": "S O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 82,
+          "winning": "1,2,3,3,5",
+          "sum": "6",
+          "num1": "S O",
+          "num2": "S E",
+          "num3": "S O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 81,
+          "winning": "3,3,3,1,2",
+          "sum": "9",
+          "num1": "S O",
+          "num2": "S O",
+          "num3": "S O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 80,
+          "winning": "2,2,3,3,4",
+          "sum": "7",
+          "num1": "S E",
+          "num2": "S E",
+          "num3": "S O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 79,
+          "winning": "2,0,0,0,2",
+          "sum": "2",
+          "num1": "S E",
+          "num2": "S E",
+          "num3": "S E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 78,
+          "winning": "1,0,0,0,2",
+          "sum": "1",
+          "num1": "S O",
+          "num2": "S E",
+          "num3": "S E",
+          "date_created": "2024-01-23"
+        }
+      ],
+      "last3": [
+        {
+          "hid": 80,
+          "winning": "3,3,3,9,1",
+          "sum": "13",
+          "num1": "S O",
+          "num2": "B O",
+          "num3": "S O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 79,
+          "winning": "3,3,3,9,9",
+          "sum": "21",
+          "num1": "S O",
+          "num2": "B O",
+          "num3": "B O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 78,
+          "winning": "3,3,3,6,6",
+          "sum": "15",
+          "num1": "S O",
+          "num2": "B E",
+          "num3": "B E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 77,
+          "winning": "3,3,3,6,6",
+          "sum": "15",
+          "num1": "S O",
+          "num2": "B E",
+          "num3": "B E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 76,
+          "winning": "1,2,3,3,5",
+          "sum": "11",
+          "num1": "S O",
+          "num2": "S O",
+          "num3": "B O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 75,
+          "winning": "1,2,3,3,5",
+          "sum": "11",
+          "num1": "S O",
+          "num2": "S O",
+          "num3": "B O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 74,
+          "winning": "3,3,3,1,2",
+          "sum": "6",
+          "num1": "S O",
+          "num2": "S O",
+          "num3": "S E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 73,
+          "winning": "2,2,3,3,4",
+          "sum": "10",
+          "num1": "S O",
+          "num2": "S O",
+          "num3": "S E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 72,
+          "winning": "2,0,0,0,2",
+          "sum": "2",
+          "num1": "S E",
+          "num2": "S E",
+          "num3": "S E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 71,
+          "winning": "1,0,0,0,2",
+          "sum": "2",
+          "num1": "S E",
+          "num2": "S E",
+          "num3": "S E",
+          "date_created": "2024-01-23"
+        }
+      ],
+      "sumall3": [
+        {
+          "hid": 75,
+          "winning": "3,3,3,9,1",
+          "first3sum": "9",
+          "first3form": "Small Odd",
+          "mid3sum": "15",
+          "mid3form": "Big Odd",
+          "last3sum": "13",
+          "last3form": "Small Odd",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 74,
+          "winning": "3,3,3,9,9",
+          "first3sum": "9",
+          "first3form": "Small Odd",
+          "mid3sum": "15",
+          "mid3form": "Big Odd",
+          "last3sum": "21",
+          "last3form": "Big Odd",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 73,
+          "winning": "3,3,3,6,6",
+          "first3sum": "9",
+          "first3form": "Small Odd",
+          "mid3sum": "12",
+          "mid3form": "Small Even",
+          "last3sum": "15",
+          "last3form": "Big Odd",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 72,
+          "winning": "3,3,3,6,6",
+          "first3sum": "9",
+          "first3form": "Small Odd",
+          "mid3sum": "12",
+          "mid3form": "Small Even",
+          "last3sum": "15",
+          "last3form": "Big Odd",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 71,
+          "winning": "1,2,3,3,5",
+          "first3sum": "6",
+          "first3form": "Small Even",
+          "mid3sum": "8",
+          "mid3form": "Small Even",
+          "last3sum": "11",
+          "last3form": "Small Odd",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 70,
+          "winning": "1,2,3,3,5",
+          "first3sum": "6",
+          "first3form": "Small Even",
+          "mid3sum": "8",
+          "mid3form": "Small Even",
+          "last3sum": "11",
+          "last3form": "Small Odd",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 69,
+          "winning": "3,3,3,1,2",
+          "first3sum": "9",
+          "first3form": "Small Odd",
+          "mid3sum": "7",
+          "mid3form": "Small Odd",
+          "last3sum": "6",
+          "last3form": "Small Even",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 68,
+          "winning": "2,2,3,3,4",
+          "first3sum": "7",
+          "first3form": "Small Odd",
+          "mid3sum": "8",
+          "mid3form": "Small Even",
+          "last3sum": "10",
+          "last3form": "Small Even",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 67,
+          "winning": "2,0,0,0,2",
+          "first3sum": "2",
+          "first3form": "Small Even",
+          "mid3sum": "0",
+          "mid3form": "Small Even",
+          "last3sum": "2",
+          "last3form": "Small Even",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 66,
+          "winning": "1,0,0,0,2",
+          "first3sum": "1",
+          "first3form": "Small Odd",
+          "mid3sum": "0",
+          "mid3form": "Small Even",
+          "last3sum": "2",
+          "last3form": "Small Even",
+          "date_created": "2024-01-23"
+        }
+      ],
+      "sumall5": [
+        {
+          "hid": 68,
+          "winning": "3,3,3,9,1",
+          "sum": "19",
+          "param": "S O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 67,
+          "winning": "3,3,3,9,9",
+          "sum": "27",
+          "param": "B O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 66,
+          "winning": "3,3,3,6,6",
+          "sum": "21",
+          "param": "S O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 65,
+          "winning": "3,3,3,6,6",
+          "sum": "21",
+          "param": "S O",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 64,
+          "winning": "1,2,3,3,5",
+          "sum": "14",
+          "param": "S E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 63,
+          "winning": "1,2,3,3,5",
+          "sum": "14",
+          "param": "S E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 62,
+          "winning": "3,3,3,1,2",
+          "sum": "12",
+          "param": "S E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 61,
+          "winning": "2,2,3,3,4",
+          "sum": "14",
+          "param": "S E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 60,
+          "winning": "2,0,0,0,2",
+          "sum": "4",
+          "param": "S E",
+          "date_created": "2024-01-23"
+        },
+        {
+          "hid": 59,
+          "winning": "1,0,0,0,2",
+          "sum": "3",
+          "param": "S O",
+          "date_created": "2024-01-23"
+        }
+      ]
+    },
+    "stud": [
+      {
+        "hid": 98,
+        "winning": "3,3,3,9,1",
+        "highcard": "4",
+        "onepair": "4",
+        "twopair": "4",
+        "threeofakind": "4",
+        "fourofakind": "4",
+        "streak": "4",
+        "gourd": "3",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 97,
+        "winning": "3,3,3,9,1",
+        "highcard": "3",
+        "onepair": "3",
+        "twopair": "3",
+        "threeofakind": "3",
+        "fourofakind": "3",
+        "streak": "3",
+        "gourd": "2",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 96,
+        "winning": "3,3,3,9,1",
+        "highcard": "2",
+        "onepair": "2",
+        "twopair": "2",
+        "threeofakind": "2",
+        "fourofakind": "2",
+        "streak": "2",
+        "gourd": "1",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 95,
+        "winning": "3,3,3,9,9",
+        "highcard": "1",
+        "onepair": "1",
+        "twopair": "1",
+        "threeofakind": "1",
+        "fourofakind": "1",
+        "streak": "1",
+        "gourd": "Gourd",
+        "date_created": "2024-01-23"
+      }
+    ],
+    "dragontiger": [
+      {
+        "hid": 80,
+        "winning": "3,3,3,9,1",
+        "1x2": "Tie",
+        "1x3": "Tie",
+        "1x4": "T",
+        "1x5": "D",
+        "2x3": "Tie",
+        "2x4": "T",
+        "2x5": "D",
+        "3x4": "T",
+        "3x5": "D",
+        "4x5": "D",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 79,
+        "winning": "3,3,3,6,6",
+        "1x2": "Tie",
+        "1x3": "Tie",
+        "1x4": "T",
+        "1x5": "T",
+        "2x3": "Tie",
+        "2x4": "T",
+        "2x5": "T",
+        "3x4": "T",
+        "3x5": "T",
+        "4x5": "Tie",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 78,
+        "winning": "3,3,3,6,6",
+        "1x2": "Tie",
+        "1x3": "Tie",
+        "1x4": "T",
+        "1x5": "T",
+        "2x3": "Tie",
+        "2x4": "T",
+        "2x5": "T",
+        "3x4": "T",
+        "3x5": "T",
+        "4x5": "Tie",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 77,
+        "winning": "1,2,3,3,5",
+        "1x2": "T",
+        "1x3": "T",
+        "1x4": "T",
+        "1x5": "T",
+        "2x3": "T",
+        "2x4": "T",
+        "2x5": "T",
+        "3x4": "Tie",
+        "3x5": "T",
+        "4x5": "T",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 76,
+        "winning": "1,2,3,3,5",
+        "1x2": "T",
+        "1x3": "T",
+        "1x4": "T",
+        "1x5": "T",
+        "2x3": "T",
+        "2x4": "T",
+        "2x5": "T",
+        "3x4": "Tie",
+        "3x5": "T",
+        "4x5": "T",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 75,
+        "winning": "3,3,3,1,2",
+        "1x2": "Tie",
+        "1x3": "Tie",
+        "1x4": "D",
+        "1x5": "D",
+        "2x3": "Tie",
+        "2x4": "D",
+        "2x5": "D",
+        "3x4": "D",
+        "3x5": "D",
+        "4x5": "T",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 74,
+        "winning": "2,2,3,3,4",
+        "1x2": "Tie",
+        "1x3": "T",
+        "1x4": "T",
+        "1x5": "T",
+        "2x3": "T",
+        "2x4": "T",
+        "2x5": "T",
+        "3x4": "Tie",
+        "3x5": "T",
+        "4x5": "T",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 73,
+        "winning": "2,0,0,0,2",
+        "1x2": "D",
+        "1x3": "D",
+        "1x4": "D",
+        "1x5": "Tie",
+        "2x3": "Tie",
+        "2x4": "Tie",
+        "2x5": "T",
+        "3x4": "Tie",
+        "3x5": "T",
+        "4x5": "T",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 72,
+        "winning": "1,0,0,0,2",
+        "1x2": "D",
+        "1x3": "D",
+        "1x4": "D",
+        "1x5": "T",
+        "2x3": "Tie",
+        "2x4": "Tie",
+        "2x5": "T",
+        "3x4": "Tie",
+        "3x5": "T",
+        "4x5": "T",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 71,
+        "winning": "2,5,1,7,8",
+        "1x2": "T",
+        "1x3": "D",
+        "1x4": "T",
+        "1x5": "T",
+        "2x3": "D",
+        "2x4": "T",
+        "2x5": "T",
+        "3x4": "T",
+        "3x5": "T",
+        "4x5": "T",
+        "date_created": "2023-12-06"
+      }
+    ],
+    "twosides": [
+      {
+        "hid": 43,
+        "winning": "3,3,3,9,1",
+        "sum": "19 S O",
+        "dragontigertie": "D",
+        "first3": "toak",
+        "mid3": "pair",
+        "last3": "mixed",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 42,
+        "winning": "3,3,3,6,6",
+        "sum": "21 S O",
+        "dragontigertie": "T",
+        "first3": "toak",
+        "mid3": "pair",
+        "last3": "pair",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 41,
+        "winning": "3,3,3,6,6",
+        "sum": "21 S O",
+        "dragontigertie": "T",
+        "first3": "toak",
+        "mid3": "pair",
+        "last3": "pair",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 40,
+        "winning": "1,2,3,3,5",
+        "sum": "14 S E",
+        "dragontigertie": "T",
+        "first3": "streak",
+        "mid3": "pair",
+        "last3": "pair",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 39,
+        "winning": "1,2,3,3,5",
+        "sum": "14 S E",
+        "dragontigertie": "T",
+        "first3": "streak",
+        "mid3": "pair",
+        "last3": "pair",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 38,
+        "winning": "3,3,3,1,2",
+        "sum": "12 S E",
+        "dragontigertie": "D",
+        "first3": "toak",
+        "mid3": "pair",
+        "last3": "streak",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 37,
+        "winning": "2,2,3,3,4",
+        "sum": "14 S E",
+        "dragontigertie": "T",
+        "first3": "pair",
+        "mid3": "pair",
+        "last3": "pair",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 36,
+        "winning": "2,0,0,0,2",
+        "sum": "4 S E",
+        "dragontigertie": "Tie",
+        "first3": "pair",
+        "mid3": "toak",
+        "last3": "pair",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 35,
+        "winning": "1,0,0,0,2",
+        "sum": "3 S O",
+        "dragontigertie": "T",
+        "first3": "pair",
+        "mid3": "toak",
+        "last3": "pair",
+        "date_created": "2024-01-23"
+      },
+      {
+        "hid": 34,
+        "winning": "2,5,1,7,8",
+        "sum": "23 B O",
+        "dragontigertie": "T",
+        "first3": "halfStreak",
+        "mid3": "mixed",
+        "last3": "halfStreak",
+        "date_created": "2023-12-06"
+      }
+    ]
+  }
