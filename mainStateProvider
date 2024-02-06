@@ -1,0 +1,1074 @@
+import NetworkError from "@/components/ErrorModals/NetworkError";
+import LoadingScreen from "@/components/LoadingScreen";
+import LowBalance from "@/components/Shared/LowBalance";
+import Notify2 from "@/components/Shared/Notify2";
+import {
+  addMinutes,
+  convertSecToMin,
+  generateDrawPeriods,
+  generateNextBetId,
+  getDateTime,
+  isEmpty,
+  reducerSelectionsArray
+} from "@/functions/msc";
+import { longDragonReducer } from "@/games/5d/longDragonReducer";
+import { manyTablesReducer } from "@/games/5d/manyTablesReducer";
+import { roadBetReducer } from "@/games/5d/roadBetReducer";
+import {
+  ACTION_TYPES,
+  INITIAL_CART_STATE,
+  INITIAL_STATE,
+  INITIAL_STATE_2SIDES,
+  INITIAL_STATE_LONG_DRAGON,
+  INITIAL_STATE_MANY_TABLES,
+  INITIAL_STATE_ROAD_BET,
+  MANY_TABLES_ACTION_TYPES,
+  TWO_SIDES_ACTION_TYPES
+} from "@/games/5d/stateActions";
+import { twoSidesReducer } from "@/games/5d/twoSidesReducer";
+import {
+  ManyTablesCartReducer,
+  StandardCartReducer,
+  StandardSelectionsReducer,
+  TwoSidesCartReducer
+} from "@/games/5d/useReducer";
+import { Game } from "@/interfaces/component";
+import TwoFA from "@/pages/2fa";
+import { fetcher } from "@/services/global/api";
+import { getBalance } from "@/services/msc_data";
+import {
+  channel_url,
+  draw_data,
+  eight_color_url,
+  log_out_session,
+  long_dragon_all_url,
+  long_dragon_url,
+  lottery_list_url,
+  recent_issue,
+  roadbet_info_url,
+  road_draws_url
+} from "@/utils/Endpoints";
+import { useDisclosure } from "@mantine/hooks";
+import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import {
+  createContext, useContext, useEffect, useMemo,
+  useReducer, useRef, useState
+} from "react";
+import { Toaster } from "react-hot-toast";
+export const StateContext = createContext({});
+
+export const StateProvider = ({ children }: any): any => {
+  const [ballance, setBallance] = useState(0);
+  // indipendent loader
+  const [OverallLoader, setOverRallLoader] = useState(false);
+  const [fetchingUserBalance, setFetchingUserBalance] = useState(false)
+  const [isLoadingBalance, setIsLoadingBalance] = useState(false)
+  const [isLoadingBalance2, setIsLoadingBalance2] = useState(false)
+  const [isCartBetting, setIsCartBetting] = useState(false)
+  const [isCartTracking, setIsCartTracking] = useState(false)
+  const [openedLowBalance, { open: openLowBalance, close: closeLowBalance }] = useDisclosure(false)
+  const boardGamesRef = useRef(null);// this is used to turn on and off the transform property of the board games
+  const [mainBetConfirmModal, setMainBetConfirmModal] = useState(false)
+  const [errorState, setErrorState] = useState<string>("")
+  const [userRecentBets, setUserRecentBets] = useState([])
+  const { data: session }: any = useSession();
+  const rebate = session?.user?.name?.rebate;
+  //Modals and Toasts
+  //const [openedBetConfirm, { open: openBetConfirm, close:closeBetConfirm }] = useDisclosure(false);
+  const [openBettingModal, setOpenBettingModal] = useState(false)
+  const [openCartBetModal, setOpenCartBetModal] = useState(false)
+  const [openTwoSidesBetModal, setOpenTwoSidesBetModal] = useState(false)
+  const [openTrackBetModal, setOpenTrackBetModal] = useState(false)
+  const [openedTrackModal, { open: openTrackModal, close: closeTrackModal }] = useDisclosure(false)
+  const [refetchUserRecentBets, setRefetchUserRecentBets] = useState(false)
+  const [lotteryNameId, setLotteryNameId] = useState("1")
+
+  const { lti, lt: game_type_id } = useRouter().query;
+  //Modals and Toasts  // openedTrackModal openTrackModal closeTrackModal
+  const [openedBetConfirm, { open: openBetConfirm, close: closeBetConfirm }] = useDisclosure(false);
+
+
+  const [drawNumbers, setDrawNumbers] = useState<any[]>([]);// contains last 100 drawNumbers
+  const [roadBetInfo, setRoadBetInfo] = useState<Game[]>([]);
+
+  // sideBar
+  const [sideBarData, setSideBarData] = useState({
+    activeLinks: "/",
+    activeSideBar: false,
+    sideBarLinkContent: null,
+  });
+
+  const [TowSidesData, setTowSidesData] = useState({
+    gameList: [],
+    selectedGame: {
+      group: "All kinds",
+    },
+  });
+
+  // lottery
+  const [lotteryData, setLotteryData] = useState({
+    // lottery_games_id: 1,
+    // lottery_type_id: 1, // deprecated
+    lottery_game_list: [],
+    lottery_id: 1,
+    lottery_name: "",
+    lotteryLink: [],
+    // game_id: 1, //deprecated
+    lottery_type_id: 1,
+    lottery_type_name: "", // eg. 5D , 3D ...
+    lobby: "",
+    model: "",
+    subGames: [],
+    groupName: "", // group name for the lottery eg. All 5
+    subGroupNames: [], //
+    // gameGroup_id: "",
+    game_tabs_id: 1,
+
+    // game selection for the lottery
+    gameGroupName: "", // game group name for the lottery eg. All 5 straight joint
+    currentOdds: 0,
+    start: 0,
+    end: 0,
+    rowSelection: "",
+    showRowName: 0,
+    rows: 0,
+    startingPoint: 0,
+    columnSelection: 0,
+    // groupType: "",
+    endingPoint: 0,
+    groupGameId: 0, // the id of games like All5 Straight(joint) Any Place ...etc,
+    sample: [],
+    unit: 2,
+    howToPlay: "",
+    dttSubGames: [], // data for dragon tiger tie sub games
+  });
+
+  // user
+  const [userData, setUserData] = useState({
+    balance: 0,
+    tabs: [],
+    activeTab: 0,
+    selectedGame: "",
+    scrollType: "",
+  });
+
+  //   Drawdata
+  const [drawData, setDrawData] = useState<any>({
+    nextDrawDatetime: "",
+    drawDateTime: "",
+    drawNumbers: [],
+    betId: "",
+    nextBetId: "",
+    drawBetIdPeriods: [],
+    drawPeriodHistory: [],
+    gameTime: {},
+    // globaldrawNumber: "",
+    // drawData: {},
+    // drawtime: 0,
+    // extra: 10,
+    // delayTimer: false,
+    // noDraw: false,
+    // gameButtonType: "",
+  });
+
+  // BetRecords Data
+  const [betData, setBetData] = useState({
+    betRecords: [],
+    trackRecords: [],
+    refetchBetRecords: false,
+    refetchTrackRecords: false,
+    refetchTrackDetails: false,
+    lotteryNameId: "1",
+    trackToken: "",
+  });
+
+  //Otp data
+  const [isOtpEnabled, setIsOtpEnabled] = useState(false);
+  const [hideOtpModal, setHideOtpModal] = useState(true);
+  const [emailAndPassword, setEmailAndPassword] = useState({
+    email: "",
+    password: "",
+  });
+
+  // Table Data
+  const [paginationData, setPaginationData] = useState({
+    pageIndex: 1,
+    pageSize: 10,
+    lotteryNameId: "1",
+    game_id: "1",
+    time: "all",
+  });
+
+  // main timer listener state
+  const [timerListener, setTimerListener] = useState(false);
+
+
+  // 5D
+  const [isInitialRender, setIsInitialRender] = useState({
+    isInitialRenderRoadBet: true,
+    isInitialRenderTwoSides: true,
+    isInitialRenderManyTables: true,
+    isInitialRenderStandard: true,
+    isInitialRenderLongDragon: true,
+    isInitalRenderBoardGames: true,
+    isInitialRenderFantan: true,
+  });
+  const [TwoSidesData, setTwoSidesData] = useState([]);
+  const [timeLeft, setTimeLeft] = useState(drawData.gameTime.timeLeft);
+
+  //state object containing all the lottery's draw Information
+  const [lotteryGameInformation, setLotteryGameInformation] = useState({});
+
+  const [standardSelections, standardSelectionsDispatch]: any = useReducer(
+    StandardSelectionsReducer,
+    INITIAL_STATE
+  );
+
+  const [standardCart, standardCartDispatch]: any = useReducer(
+    StandardCartReducer,
+    INITIAL_CART_STATE
+  );
+  const [twoSidesCart, twoSidesCartDispatch]: any = useReducer(
+    TwoSidesCartReducer,
+    INITIAL_CART_STATE
+  );
+
+  const [roadBetCart, roadBetCartDispatch]: any = useReducer(
+    TwoSidesCartReducer, //uses the same reducer as two sides
+    INITIAL_CART_STATE
+  );
+
+  const [manyTablesCart, manyTablesCartDispatch]: any = useReducer(
+    ManyTablesCartReducer,
+    INITIAL_CART_STATE
+  );
+  const [twosideSelections, twosideSelectionsDispatch]: any = useReducer(
+    twoSidesReducer,
+    INITIAL_STATE_2SIDES
+  );
+  const [longDragonSelections, longDragonDispatch]: any = useReducer(
+    longDragonReducer,
+    INITIAL_STATE_LONG_DRAGON
+  );
+
+  const [manyTablesSelections, manyTablesDispatch]: any = useReducer(
+    manyTablesReducer,
+    INITIAL_STATE_MANY_TABLES
+  );
+  const [roadBetSelections, roadBetDispatch]: any = useReducer(
+    roadBetReducer,
+    INITIAL_STATE_ROAD_BET
+  );
+
+
+  const [vvv, zzz] = useState(0);
+
+  useEffect(() => {
+    zzz((prev) => prev++)
+    console.log("lotteryDatalotteryData", vvv);
+  }, [])
+  useEffect(() => {
+
+    console.log("lotteryDatalotteryData", lotteryData);
+  }, [lotteryData]);
+
+
+  const clearAllSelections = () => {
+    // standardSelectionsDispatch({ type: "CLEAR_ALL_ROWS" })
+    // twosideSelectionsDispatch({ type: "CLEAR_ALL_ROWS" })
+    // longDragonDispatch({ type: "CLEAR_ALL_ROWS" })
+    // manyTablesDispatch({ type: "CLEAR_ALL_ROWS" })
+    // roadBetDispatch({ type: "CLEAR_ALL_ROWS" })
+
+    standardSelectionsDispatch({
+      type: ACTION_TYPES.CLEAR_ALL_ROWS,
+      payload: reducerSelectionsArray([])
+    })
+    twosideSelectionsDispatch({
+      type: TWO_SIDES_ACTION_TYPES.CLEAR_TWO_SIDES,
+      payload: {},
+    })
+
+    longDragonDispatch({
+      type: "CLEAR",
+      payload: {},
+    })
+
+    manyTablesDispatch({
+      type: MANY_TABLES_ACTION_TYPES.CLEAR_MANY_TABLES,
+      payload: {},
+    })
+
+    manyTablesDispatch({
+      type: ACTION_TYPES.CLEAR_ALL_SELECTIONS,
+      payload: {},
+    })
+
+    roadBetDispatch({
+      type: "CLEAR_ROAD",
+      payload: {}
+    })
+    // boar
+  }
+
+  const TwoSidesMenu = [
+    "Conv",
+    "All kinds",
+    // "Dragon Tiger"
+  ];
+  const BoardGamesMenu: string[] = ["Bull", "Stud", "Baccarat"];
+  const LongDragonMenu = [
+    { game_name: "Current", url: long_dragon_url },
+    { game_name: "All Colors", url: long_dragon_all_url },
+    { game_name: "Customize", url: long_dragon_url },
+    {
+      game_name: lotteryData?.lottery_game_list
+        .filter((item: any) => item.lottery_id == lti).map(x => x.lottery_name)[0]
+      , url: eight_color_url
+    },
+  ];
+  const marks = [
+    { value: 2, label: "2" },
+    { value: 3, label: "3" },
+    { value: 4, label: "4" },
+    { value: 5, label: "5" },
+    { value: 6, label: "6" },
+    { value: 7, label: "7" },
+    { value: 8, label: "8" },
+    { value: 9, label: "9" },
+    { value: 10, label: "10+" },
+  ];
+  const [menu, setMenu] = useState<"Conv" | "All kinds">("Conv");//two sides 5D
+  const [boardMenuItem, setBoardMenuItem] = useState<string>("Bull");//board games
+  const [activeTab, setActiveTab] = useState(LongDragonMenu[0]); //for long dragon
+  const [modalContent, setModalContent] = useState("bet"); //for long dragon
+  const [rangeSliderValue, setRangeSliderValue] = useState([2, 7]);
+
+  const [showToaster, setShowToaster] = useState(true);
+  const [twoFAData, setTwoFAData] = useState({});
+  // const [show2FA, set2FA] = useState(false);
+  const [opened, { open, close }] = useDisclosure(false);
+  const [dragonOpened, { open: dragonOpen, close: dragonClosed }] =
+    useDisclosure(false);
+  const [manyTableOpened, { open: manyTableOpen, close: manyTableClose }] =
+    useDisclosure(false);
+  // setRangeSlider
+  const [rangeSlider, setRangeSlider] = useState("block"); //to show rnage slider in long dragon
+  const [show, setShow] = useState(true); // this shows either the drawNumber or the please wait
+
+  const [manyTableTabs, setManyTableTabs] = useState(0);
+
+  const [drawAndTimeData, setDrawAndTimeData] = useState([]);
+  const [showPleaseWait, setShowPleaseWait] = useState(false);
+
+  // custom modal or bet modal boolean
+  const [manyTablesModal, setManyTablesModal] = useState("bet");
+
+  // event source pending and done listener
+  const [stop, setStop] = useState("");
+
+
+
+  const clearAllCart = () => {
+    standardCartDispatch({ type: "CLEAR_CART" });
+    twoSidesCartDispatch({ type: "CLEAR_CART" });
+    manyTablesCartDispatch({ type: "CLEAR_CART" });
+    roadBetCartDispatch({ type: "CLEAR_CART" });
+  };
+
+  const clearStandardSelectionsAfterBet = () => {
+    standardSelectionsDispatch({
+      type: ACTION_TYPES.CLEAR_ALL_ROWS,
+      payload: reducerSelectionsArray([]) as any,
+    });
+  };
+
+
+  const canUserPlaceBet = async (betAmt: string | number) => {
+    setFetchingUserBalance(true);
+    const userBalance = await getBalance(session?.user?.name?.token);
+    if (Number(userBalance) < Number(betAmt)) {
+      setFetchingUserBalance(false);
+      openLowBalance();
+      return false;
+    } else if (Number(userBalance) <= 0) {
+      setFetchingUserBalance(false);
+      openLowBalance();
+      return false;
+    }
+    setFetchingUserBalance(false);
+    return true;
+  };
+
+
+
+  const canUserPlaceBet2 = async (betAmt: string | number) => {
+    setIsLoadingBalance(true);
+    const userBalance = await getBalance(session?.user?.name?.token);
+    if (Number(userBalance) < Number(betAmt)) {
+      setIsLoadingBalance(false);
+      openLowBalance();
+      return false;
+    } else if (Number(userBalance) <= 0) {
+      setIsLoadingBalance(false);
+      openLowBalance();
+      return false;
+    }
+    setIsLoadingBalance(false);
+    return true;
+  };
+
+
+
+  const canUserPlaceBetFromCart = async (betAmt) => {
+    setIsCartBetting(true);
+    const userBalance = await getBalance(session?.user?.name?.token);
+    if (Number(userBalance) < Number(betAmt)) {
+      setIsCartBetting(false);
+      openLowBalance();
+      return false;
+    } else if (Number(userBalance) <= 0) {
+      setIsCartBetting(false);
+      openLowBalance();
+      return false;
+    }
+    setIsCartBetting(false);
+    return true;
+  };
+
+  const canUserTrackBetFromCart = async (betAmt) => {
+    setIsCartTracking(true);
+    const userBalance = await getBalance(session?.user?.name?.token);
+    if (Number(userBalance) < Number(betAmt)) {
+      setIsCartTracking(false);
+      openLowBalance();
+      return false;
+    } else if (Number(userBalance) <= 0) {
+      setIsCartTracking(false);
+      openLowBalance();
+      return false;
+    }
+    setIsCartTracking(false);
+    return true;
+  };
+
+
+
+  const [localStorageNextBetId, setLocalStorageNextBetId] = useState(null);
+
+  const values = {
+    lotteryData,
+    setLotteryData,
+    sideBarData,
+    setSideBarData,
+    userData,
+    setUserData,
+    drawData,
+    setDrawData,
+    betData,
+    setBetData,
+    paginationData,
+    setPaginationData,
+    standardSelections,
+    standardSelectionsDispatch,
+    twosideSelectionsDispatch,
+    isOtpEnabled,
+    setIsOtpEnabled,
+    hideOtpModal,
+    setHideOtpModal,
+    emailAndPassword,
+    setEmailAndPassword,
+    TwoSidesData,
+    setTwoSidesData,
+    manyTableTabs,
+    setManyTableTabs,
+    // isInitialRenderRoadBet,
+    // setIsInitialRenderRoadBet,
+    isInitialRender,
+    setIsInitialRender,
+    twosideSelections,
+    TowSidesData,
+    setTowSidesData,
+    standardCart,
+    standardCartDispatch,
+    manyTablesCart,
+    manyTablesCartDispatch,
+    twoSidesCart,
+    roadBetSelections,
+    roadBetDispatch,
+    roadBetCart,
+    roadBetCartDispatch,
+    manyTablesSelections,
+    manyTablesDispatch,
+    timeLeft,
+    setTimeLeft,
+    twoSidesCartDispatch,
+    longDragonSelections,
+    longDragonDispatch,
+    setShowToaster,
+    OverallLoader,
+    setOverRallLoader,
+    ballance,
+    setBallance,
+    rangeSliderValue,
+    setRangeSliderValue,
+    show,
+    setShow,
+    clearAllCart,
+    TwoFAOpened: opened,
+    TwoFAOpen: open,
+    TwoFAClose: close,
+    twoFAData,
+    setTwoFAData,
+    activeTab,
+    rangeSlider,
+    setRangeSlider,
+    setActiveTab,
+    manyTableOpened,
+    manyTableOpen,
+    manyTableClose,
+    drawNumbers, setDrawNumbers,
+    roadBetInfo, setRoadBetInfo,
+    rebate,
+    // drawAndTimeData,
+    // setDrawAndTimeData,
+    marks,
+    modalContent,
+    setModalContent,
+    getDrawAndPeriodList,
+    menu,
+    setMenu,
+    LongDragonMenu,
+    TwoSidesMenu,
+    BoardGamesMenu,
+    boardMenuItem, setBoardMenuItem,
+    dragonOpened,
+    dragonOpen,
+    dragonClosed,
+    showPleaseWait,
+    setShowPleaseWait,
+    manyTablesModal,
+    setManyTablesModal,
+    stop,
+    clearStandardSelectionsAfterBet,
+    fetchingUserBalance,
+    setFetchingUserBalance,
+    isLoadingBalance,
+    setIsLoadingBalance,
+    isLoadingBalance2,
+    setIsLoadingBalance2,
+    openedBetConfirm,
+    openBetConfirm,
+    closeBetConfirm,
+    isCartBetting,
+    setIsCartBetting,
+    isCartTracking,
+    setIsCartTracking,
+    canUserPlaceBet,
+    canUserPlaceBet2,
+    canUserPlaceBetFromCart,
+    canUserTrackBetFromCart,
+    localStorageNextBetId,
+    timerListener,
+    setTimerListener,
+    boardGamesRef,
+    clearAllSelections,
+    mainBetConfirmModal, setMainBetConfirmModal,
+    openBettingModal,
+    setOpenBettingModal,
+    openCartBetModal, setOpenCartBetModal,
+    openTwoSidesBetModal, setOpenTwoSidesBetModal,
+    openTrackBetModal, setOpenTrackBetModal,
+    openedTrackModal, openTrackModal, closeTrackModal,
+    refetchUserRecentBets, setRefetchUserRecentBets,
+    lotteryNameId, setLotteryNameId,
+    userRecentBets, setUserRecentBets
+  };
+
+  const CONTEXT_VALUES = useMemo(
+    () => values,
+    [
+      lotteryData,
+      setLotteryData,
+      sideBarData,
+      setSideBarData,
+      userData,
+      setUserData,
+      drawData,
+      setDrawData,
+      betData,
+      setBetData,
+      paginationData,
+      setPaginationData,
+      standardSelections,
+      activeTab,
+      rangeSlider,
+      show,
+      manyTableTabs,
+      standardSelectionsDispatch,
+      twosideSelectionsDispatch,
+      isOtpEnabled,
+      setIsOtpEnabled,
+      hideOtpModal,
+      setHideOtpModal,
+      emailAndPassword,
+      setEmailAndPassword,
+      TwoSidesData,
+      setTwoSidesData,
+      boardMenuItem,
+      // isInitialRenderRoadBet,
+      // setIsInitialRenderRoadBet,
+      LongDragonMenu,
+      drawNumbers,
+      roadBetInfo,
+      rebate,
+      modalContent,
+      rangeSliderValue,
+      isInitialRender,
+      setIsInitialRender,
+      twosideSelections,
+      TowSidesData,
+      setTowSidesData,
+      manyTablesSelections,
+      manyTablesDispatch,
+      standardCart,
+      standardCartDispatch,
+      manyTablesCart,
+      manyTablesCartDispatch,
+      roadBetSelections,
+      roadBetDispatch,
+      twoSidesCart,
+      twoSidesCartDispatch,
+      roadBetCart,
+      roadBetCartDispatch,
+      longDragonSelections,
+      longDragonDispatch,
+      OverallLoader,
+      setOverRallLoader,
+      ballance,
+      setBallance,
+      menu,
+      timeLeft,
+      // show2FA,
+      opened,
+      twoFAData,
+      dragonOpened,
+      dragonClosed,
+      manyTableOpened,
+      manyTableOpen,
+      manyTableClose,
+      // drawAndTimeData,
+      showPleaseWait,
+      manyTablesModal,
+      stop,
+      openedBetConfirm,
+      fetchingUserBalance,
+      setFetchingUserBalance,
+      isLoadingBalance,
+      setIsLoadingBalance,
+      isLoadingBalance2,
+      setIsLoadingBalance2,
+      isCartBetting,
+      isCartTracking,
+      canUserPlaceBet,
+      canUserPlaceBet2,
+      canUserPlaceBetFromCart,
+      canUserTrackBetFromCart,
+      localStorageNextBetId,
+      timerListener,
+      setTimerListener,
+      boardGamesRef,
+      canUserPlaceBetFromCart, canUserTrackBetFromCart,
+      mainBetConfirmModal, setMainBetConfirmModal,
+      openBettingModal,
+      setOpenBettingModal,
+      openCartBetModal, setOpenCartBetModal,
+      openTwoSidesBetModal, setOpenTwoSidesBetModal,
+      setOpenTrackBetModal,
+      openedTrackModal, openTrackModal, closeTrackModal,
+      refetchUserRecentBets, setRefetchUserRecentBets,
+      lotteryNameId, setLotteryNameId,
+      userRecentBets, setUserRecentBets
+    ]
+  );
+
+  const fetchRoadBetDrawNumbers = async () => {
+    // const res: any = await fetcher(road_draws_url);
+    const [roadBetDrawNumbers, roadBetInfo]: any = await Promise.all([
+      fetcher(`${road_draws_url}?lottery_id=${lotteryData.lottery_id}`),
+      fetcher(roadbet_info_url),
+    ]);
+    return { roadBetDrawNumbers, roadBetInfo };
+  };
+
+  useEffect(() => {
+    const getDrawNumbers = async () => {
+      // const { roadBetDrawNumbers, roadBetInfo } = await fetchDrawNumbers();
+
+      if (isInitialRender.isInitialRenderRoadBet) {
+        try {
+          const { roadBetDrawNumbers, roadBetInfo }: any = await fetchRoadBetDrawNumbers();
+          console.log("roooooaddddddddddd", roadBetInfo.data);
+          console.log(
+            "roooooaddddddddddd first",
+            roadBetDrawNumbers.data.reverse()
+          );
+          setDrawNumbers(roadBetDrawNumbers.data.reverse());
+          // setDrawNumbers(drawNumbers);
+          setRoadBetInfo(roadBetInfo.data);
+        } catch (error) {
+          console.log("error", error);
+        }
+
+      } else {
+        try {
+          const { data: roadBetDrawNumbers }: any = await fetcher(
+            `${road_draws_url}?lottery_id=${lotteryData.lottery_id}`
+          );
+          // set state
+          console.log("roooooaddddddddddd second", roadBetDrawNumbers);
+          setDrawNumbers(roadBetDrawNumbers.reverse());
+        } catch (error) {
+          console.log("error", error);
+        }
+
+      }
+      // isInitialRender
+      // setIsInitialRender
+      if (isInitialRender.isInitialRenderRoadBet) {
+        setIsInitialRender({
+          ...isInitialRender,
+          isInitialRenderRoadBet: false,
+        });
+      }
+
+      // if (isMounted) {
+      //   setDrawNumbers(roadBetDrawNumbers.data.reverse());
+      //   // setDrawNumbers(drawNumbers);
+      //   setRoadBetInfo(roadBetInfo.data);
+      // }
+    };
+    setTimeout(()=>{
+      getDrawNumbers();
+    }, 2000)
+    // getDrawNumbers();
+
+    // return () => {
+    //   isMounted = false;
+    // };
+  }, [drawData.nextBetId, game_type_id]);
+
+
+
+
+  const userToken = session?.user?.name?.token;
+
+  let count = 0;
+  const handleLogout = async () => {
+    if (count > 0) {
+      return;
+    }
+    Notify2(
+      "Your session has expired, please login again",
+      "bottom-center",
+      "error",
+      7000
+    );
+    count++;
+
+    setTimeout(async () => {
+      const res: any = await fetcher(
+        log_out_session,
+        "POST",
+        null,
+        "Bearer " + userToken
+      );
+      if (res?.data?.type == "success") {
+        signOut();
+      }
+      console.log("zxcv", res);
+    }, 7000);
+  };
+
+  // const [done, setDone] = useState("");
+
+
+  const [check, setCheck] = useState(false);
+  //updating the next bet id in the local storage
+  useEffect(() => {
+    console.log(
+      "Received ",
+      JSON.parse((localStorage as any).getItem("nextBetId"))
+    );
+    setLocalStorageNextBetId(
+      JSON.parse((localStorage as any).getItem("nextBetId"))
+    );
+  }, [check]);
+
+  useEffect(() => {
+    if (!localStorageNextBetId) {
+      return;
+    }
+    if (!game_type_id) {
+      console.log("game type id is null");
+      return;
+    }
+    if (drawData.nextBetId === "") {
+      return;
+    }
+    console.log("drawData.nextBet ", drawData.nextBetId);
+
+    const params: any = {
+      token: userToken ?? "p",
+      lottery_id: game_type_id,
+      period: localStorageNextBetId,
+    };
+
+    console.log("params", params);
+    const queryString = new URLSearchParams(params).toString();
+
+    console.log("drawData.nextBettt ", queryString.slice(-12));
+
+    // In case you want to send data
+
+    // Prepare the channel URL (Endpoint where we should listen for messages, e.g., sse_server.php)
+    const url = channel_url + queryString;
+
+    console.log("Received", url);
+
+    // Create a new EventSource object
+    // let eventSource;
+
+    // if (queryString.slice(-12) !== drawData.nextBetId) {
+    //   eventSource.close()
+    //   // return;
+    // }
+
+    let eventSource = new EventSource(url);
+
+    // Define the event listener to handle incoming events
+    eventSource.addEventListener("message", function (event) {
+      const eventData = JSON.parse(event.data);
+      // console.log("Received event:", eventData);
+      // setStop(eventData.draw_status);
+      // if (eventData.draw_status == "done") {
+      //   setDone("done");
+      //   localStorage.setItem(`nextBetId`, JSON.stringify(drawData.nextBetId));
+      //   setCheck(!check);
+      //   //fetching new draw number when it is finally drawn at the back office
+
+      //   // setDrawData({ ...drawData, drawNumbers: [1, 2, 3, 4, 5] });
+      //   setShowPleaseWait(false);
+      //   // handleEventSouce(2);
+      //   eventSource.close();
+      // }
+      handleEventSouce(eventData.action);
+      // setStop(false);
+    });
+
+    // Handle errors and connection closures
+    // eventSource.addEventListener("error", function (event) {
+    //   if (event.readyState === EventSource.CLOSED) {
+    //     console.log("Connection closed.");
+    //   } else {
+    //     console.log("Error occurred:", event);
+    //   }
+    // });
+  }, [userToken, drawData, localStorageNextBetId]);
+
+  const handleEventSouce = (action: any) => {
+    switch (action) {
+      case 1:
+        handleLogout();
+        break;
+      case 2:
+      // fetchDrawNumbers();
+      // case "logout":
+      //   toast.error(eventData.message);
+      //   break;
+      // case "message":
+      //   toast(eventData.message);
+      //   break;
+      default:
+        return;
+    }
+  };
+
+  // DEFAULT LOADER
+  const [mainPageLoader, setMainPageLoader] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetcher(lottery_list_url);
+        const lott_list: any = res.data;
+        console.log("navigation", lott_list.data);
+        // console.log("navigation", typeof lott_list);
+
+        if (!isEmpty(lott_list.data)) {
+          // alert("hello")
+          const lottery_data_main_list = lott_list?.data?.map((item: any) => {
+            return {
+              label: item.lottery_name,
+              lottery_id: item.lottery_id,
+            };
+          });
+          console.log("yess", lottery_data_main_list);
+          console.log("kket", lott_list.data);
+
+          setLotteryData({
+            ...lotteryData,
+            lottery_game_list: lott_list.data,
+            lotteryLink: lottery_data_main_list,
+            lobby: lott_list.lobby,
+          });
+          setTimeout(() => {
+            setMainPageLoader(false);
+          }, 1000);
+        } else {
+
+          setErrorState("404");
+          console.log("no data");
+          // return
+        }
+      } catch (error) {
+        console.error("Error occurred:", error);
+        setErrorState("404");
+        console.log("no data");
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.error("Response status:", error.response.status);
+          console.error("Response data:", error.response.data);
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.error("No response received. The request might not have reached the server.");
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.error("Error message:", error.message);
+        }
+      }
+    })();
+  }, []);
+
+  async function fetchDrawNumbers() {
+    let data: any = await fetcher(
+      `${draw_data}?drawNumber&lottery_id=${game_type_id}`,
+      "GET"
+    );
+    // setDrawData({ ...drawData, drawNumbers: [1, 2, 3, 4, 5] });
+    let data1 = data.data.drawinfo.draw_number;
+    const cc = document?.querySelectorAll(".page_ball__UkoSZ");
+    cc.forEach((element: any, i) => {
+      element.innerText = data1[i];
+      console.log("new draw numbers", element.innerText);
+      console.log("new draw numbers");
+    });
+    console.log("new draw numbers", cc);
+
+    console.log("new draw numbers ", data.data.drawinfo.draw_number);
+  }
+
+  useEffect(() => { }, []);
+  // `${draw_status}?lottery_id=${lottery_id}&period=${next_draw_date}`
+  async function getDrawAndPeriodList(game_type_id: number, fetch = true) {
+    try {
+      // use promise.all
+      console.log("results game type id ", game_type_id);
+      const [drawInfo, drawNumbers, drawPeriodHistory] = await Promise.all([
+        fetcher(`${draw_data}?drawInfo&lottery_id=${game_type_id}`, "GET"),
+        fetch
+          ? fetcher(`${draw_data}?drawNumber&lottery_id=${game_type_id}`, "GET")
+          : [],
+        fetcher(`${recent_issue}?lottery_id=${game_type_id}`, "GET"),
+        // fetcher(road_draws_url)
+      ]);
+      // console.log("res", drawInfo);
+      const _data: any[] = [
+        drawInfo.data,
+        (drawNumbers as any).data,
+        (drawPeriodHistory.data as any).data,
+      ]; //await Promise.all([drawInfo]);
+      console.log("datasssss", _data);
+
+      // generate next bet id and datetime
+
+      let intervalMinute = convertSecToMin(_data[0].totaltime);
+      let next_draw_date_time = getDateTime(
+        addMinutes(_data[0].drawinfo.draw_datetime, intervalMinute)
+      );
+      // _data[0].totaltime
+      // let inMin = convertSecToMin(TotalTime);
+      let next_bet_id = generateNextBetId(
+        _data[0].drawinfo.draw_date,
+        _data[0].drawinfo.draw_datetime,
+        intervalMinute
+      );
+
+      let drawPeriodsArr = generateDrawPeriods(
+        _data[0].drawinfo.draw_date,
+        _data[0].drawinfo.draw_time,
+        _data[0].totaltime
+      );
+      setDrawData({
+        ...drawData,
+        nextDrawDatetime: next_draw_date_time,
+        drawDateTime: _data[0].drawinfo.draw_datetime,
+        drawNumbers: fetch
+          ? _data[1]?.drawinfo.draw_number
+          : drawData.drawNumbers,
+        betId: _data[0].drawinfo.draw_date,
+        nextBetId: next_bet_id,
+        drawBetIdPeriods: drawPeriodsArr,
+        gameTime: {
+          totalTime: _data[0].totaltime,
+          timeLeft: _data[0].timeLeft,
+        },
+        drawPeriodHistory: _data[2],
+      });
+      // console.log("adizaaa");
+      // nextDrawDatetime: "",
+      // drawDateTime: "",
+      // drawNumbers: [],
+      // betId: "",
+      // nextBetId: "",
+      // drawBetIdPeriods: [],
+      return [
+        ..._data,
+        { nextBetId: 1, nextDrawDatetime: next_draw_date_time },
+      ];
+    } catch (error) {
+      // Handle errors appropriately
+      console.error("Error making multiple API calls:", error);
+      throw error; // Rethrow the error if needed
+    }
+  }
+
+  function renderChildrenContent() {
+    if (errorState === "404") {
+      return <NetworkError bgColor="#FFF" />;
+    } else {
+      return (
+        <LoadingScreen bgColor="#FFF" />
+      );
+    }
+  }
+
+  return (
+    <StateContext.Provider value={CONTEXT_VALUES}>
+      <TwoFA />
+      {showToaster && <Toaster containerStyle={{ marginBottom: "25px" }} />}
+      {mainPageLoader ? (
+        renderChildrenContent()
+      ) : (
+        <div>
+          <LowBalance opened={openedLowBalance} close={closeLowBalance} />
+          {children}
+        </div>
+      )}
+    </StateContext.Provider>
+  );
+};
+
+export const MainStateProvider = () => useContext(StateContext);
