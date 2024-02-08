@@ -1,0 +1,5 @@
+export const side_history_url = `${seperate_domain}/drawhistory/v1/select/fived`
+export const side_history_url_3d = `${seperate_domain}/new_ui_5d/history_functions_3d.php`
+export const side_history_url_fast3 = `${seperate_domain}/new_ui_5d//history_functions_fast_3.php`
+export const side_history_url_eleven5 = `${seperate_domain}/new_ui_5d//history_functions_11x5.php`
+export const side_history_url_mark6 = `${seperate_domain}/new_ui_5d//history_functions_mark6.php`
