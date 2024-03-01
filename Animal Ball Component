@@ -1,0 +1,22 @@
+import React from 'react'
+import styles from './ExtraNo/page.module.css'
+import Image from 'next/image'
+
+function AnimalBallComponent({check,ballname,ballsWithColors}) {
+  return (
+    <div style={{border:ballname == check?`3px solid ${ballsWithColors && ballsWithColors.find((ball)=> ball.number === ballname)}`:check ==null ?`3px solid ${ballsWithColors && ballsWithColors.find((ball)=> ball.number === ballname)?.color}`:`0px solid $${ballsWithColors && ballsWithColors.find((ball)=> ball.number === ballname)?.color}`}}  className={`${styles.ball} ${ballname == check?styles.checkball:check ==null ?styles.ball:styles.notchecked} `}>
+    <div  className={styles.flowdown}>{ballname}</div>
+    <div style={{marginTop:10}} className={styles.flowdown_img}>
+        <Image
+            src={`/Assets/animals/${ballsWithColors && ballsWithColors.find((ball)=> ball.number === ballname)?.animal}.png`}
+            alt="Picture of the author"
+            width={250}
+            height={250}
+            className={styles.animal_image}
+        />
+    </div>
+  </div>
+  )
+}
+
+export default AnimalBallComponent
