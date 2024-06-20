@@ -1,3 +1,4 @@
+
 function TestFormu(array,contraints=[],toform=1,isSpan=false,spanType=3) {
   if(isSpan){
      const selected_num = array[0];
@@ -14,15 +15,6 @@ function TestFormu(array,contraints=[],toform=1,isSpan=false,spanType=3) {
       return multiple_numbers.reduce((accumulator,currentValue)=>accumulator * currentValue) * toform
     }else{
 
-      if (array.length === 2) {
-        let combinations_of_row1 = getCombinations(array[0],contraints[0])
-        let combinations_of_row2 = getCombinations(array[1],contraints[1])
-        if(contraints[0] > contraints[1]){
-          return mergeAndCheck2(combinations_of_row2,combinations_of_row1).length * toform;
-        }else{
-          return mergeAndCheck2(combinations_of_row1,combinations_of_row2).length * toform;
-        }
-      }
     }
     
   }};
