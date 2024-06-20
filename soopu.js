@@ -1,9 +1,1 @@
-  if (array.length === 2) {
-        let combinations_of_row1 = getCombinations(array[0],contraints[0])
-        let combinations_of_row2 = getCombinations(array[1],contraints[1])
-        if(contraints[0] > contraints[1]){
-          return mergeAndCheck2(combinations_of_row2,combinations_of_row1).length * toform;
-        }else{
-          return mergeAndCheck2(combinations_of_row1,combinations_of_row2).length * toform;
-        }
-      }
+aWYgKGFycmF5Lmxlbmd0aCA9PT0gMjAwKSB7CiAgICAgICAgbGV0IGNvbWJpbmF0aW9uc19vZl9yb3cxID0gZ2V0Q29tYmluYXRpb25zKGFycmF5WzBdLGNvbnRyYWludHNbMF0pCiAgICAgICAgbGV0IGNvbWJpbmF0aW9uc19vZl9yb3cyID0gZ2V0Q29tYmluYXRpb25zKGFycmF5WzFdLGNvbnRyYWludHNbMV0pCiAgICAgICAgaWYoY29udHJhaW50c1swXSA+IGNvbnRyYWludHNbMV0pewogICAgICAgICAgcmV0dXJuIG1lcmdlQW5kQ2hlY2syKGNvbWJpbmF0aW9uc19vZl9yb3cyLGNvbWJpbmF0aW9uc19vZl9yb3cxKS5sZW5ndGggKiB0b2Zvcm07CiAgICAgICAgfWVsc2V7CiAgICAgICAgICByZXR1cm4gbWVyZ2VBbmRDaGVjazIoY29tYmluYXRpb25zX29mX3JvdzEsY29tYmluYXRpb25zX29mX3JvdzIpLmxlbmd0aCAqIHRvZm9ybTsKICAgICAgICB9CiAgICAgIH0=
