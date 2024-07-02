@@ -1,0 +1,16 @@
+  {
+    "money": {
+      "crypto": [
+        {
+          "name": "Bitcoin",
+          "cryptovalue": "BTC",
+          "cryptoaddress": "bc1qlj2z3xug99ht9jd06nyup7g7cklmkfgfktle5n"
+        },
+        {
+          "name": "TRON",
+          "cryptovalue": "TRX",
+          "cryptoaddress": "TJMfzRPw5DWYNMWRn9MMR5iFEfv6Lzt7CQ"
+        }
+      ]
+    }
+  }
