@@ -17,12 +17,14 @@ jobs:
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
-      - name: Delete greeta.py
+      - name: Wait for 1 minute
+        run: sleep 60
+      - name: Delete mygo.go
         run: |
-          rm -f ${{ github.workspace }}/greeta.py
+          rm -f ${{ github.workspace }}/mygo.go
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
           git add -u
-          git commit -m "Deleted greeta.py"
+          git commit -m "Deleted mygo.go after delay"
           git push origin ${{ github.ref }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
