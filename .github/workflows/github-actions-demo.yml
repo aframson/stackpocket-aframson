@@ -5,8 +5,8 @@ on:
     branches:
       - main
   schedule:
-    # Run every two minutes
-    - cron: '*/2 * * * *'
+    # Run every five minutes
+    - cron: '*/5 * * * *'
 
 jobs:
   run-script:
