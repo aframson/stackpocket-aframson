@@ -5,8 +5,9 @@ on:
     branches:
       - main
   schedule:
-    # Run every five minutes
+    # Run every six minutes
     - cron: '*/6 * * * *'
+  workflow_dispatch: # Allows manual triggering for debugging
 
 jobs:
   run-script:
@@ -24,7 +25,7 @@ jobs:
       - name: Run Python script
         run: |
           python say_hello.py
-          
+
       - name: Commit results
         run: |
           git config --global user.name 'github-actions'
