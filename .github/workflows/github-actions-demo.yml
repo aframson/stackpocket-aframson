@@ -1,30 +1,31 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+name: Run Python Script
 
-on: [push]
+on:
+  schedule:
+    # Run every two minutes
+    - cron: '*/2 * * * *'
 
 jobs:
-  Explore-GitHub-Actions:
+  run-script:
     runs-on: ubuntu-latest
+
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
+      - name: Check out repository
         uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Run Python script
         run: |
-          ls ${{ github.workspace }}
-      - name: Wait for 1 minute
-        run: sleep 60
-      - name: Delete mygo.go
+          python say_hello.py
+          
+      - name: Commit results
         run: |
-          rm -f ${{ github.workspace }}/mygo.go
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-          git add -u
-          git commit -m "Deleted mygo.go after delay"
+          git add result.txt
+          git commit -m 'Updated result.txt with new message'
           git push origin ${{ github.ref }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
